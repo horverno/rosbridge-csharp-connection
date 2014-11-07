@@ -1,0 +1,11 @@
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\bin\Debug\RosTestTurtlesim.exe.config
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\bin\Debug\RosTestTurtlesim.exe
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\bin\Debug\RosTestTurtlesim.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\bin\Debug\RosBridgeDotNet.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\bin\Debug\Newtonsoft.Json.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\bin\Debug\RosBridgeDotNet.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\bin\Debug\Newtonsoft.Json.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\bin\Debug\Newtonsoft.Json.xml
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\obj\Debug\RosTestTurtlesim.csprojResolveAssemblyReference.cache
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\obj\Debug\RosTestTurtlesim.exe
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosTestTurtlesim\obj\Debug\RosTestTurtlesim.pdb

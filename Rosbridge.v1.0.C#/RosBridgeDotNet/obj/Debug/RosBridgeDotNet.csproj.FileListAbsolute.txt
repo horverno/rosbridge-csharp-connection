@@ -1,0 +1,39 @@
+c:\users\zsolt bendes\documents\visual studio 11\Projects\ROS\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.dll
+c:\users\zsolt bendes\documents\visual studio 11\Projects\ROS\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.pdb
+c:\users\zsolt bendes\documents\visual studio 11\Projects\ROS\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.dll
+c:\users\zsolt bendes\documents\visual studio 11\Projects\ROS\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.pdb
+c:\users\zsolt bendes\documents\visual studio 11\Projects\ROS\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.xml
+c:\users\zsolt bendes\documents\visual studio 11\Projects\ROS\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
+c:\users\zsolt bendes\documents\visual studio 11\Projects\ROS\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
+c:\users\zsolt bendes\documents\visual studio 11\Projects\ROS\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb
+C:\Users\herno_000\Desktop\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.dll
+C:\Users\herno_000\Desktop\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.pdb
+C:\Users\herno_000\Desktop\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.pdb
+C:\Users\herno_000\Desktop\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.xml
+C:\Users\herno_000\Desktop\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
+C:\Users\herno_000\Desktop\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
+C:\Users\herno_000\Desktop\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb
+C:\Dropbox\Oktatás\ngb_in039_1_tud\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.dll
+C:\Dropbox\Oktatás\ngb_in039_1_tud\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.pdb
+C:\Dropbox\Oktatás\ngb_in039_1_tud\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
+C:\Dropbox\Oktatás\ngb_in039_1_tud\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb
+C:\Dropbox\Oktatás\ngb_in039_1_tud\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.dll
+C:\Dropbox\Oktatás\ngb_in039_1_tud\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.pdb
+C:\Dropbox\Oktatás\ngb_in039_1_tud\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.xml
+C:\Dropbox\Oktatás\ngb_in039_1_tud\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
+C:\Dropbox\Oktatás\ngb_in039_1_tud\2012\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.dll
+C:\Dropbox\Oktatás\ngb_in039_1_tud\2012\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.pdb
+C:\Dropbox\Oktatás\ngb_in039_1_tud\2012\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.dll
+C:\Dropbox\Oktatás\ngb_in039_1_tud\2012\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.pdb
+C:\Dropbox\Oktatás\ngb_in039_1_tud\2012\ROSBridgeDotNet\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.xml
+C:\Dropbox\Oktatás\ngb_in039_1_tud\2012\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
+C:\Dropbox\Oktatás\ngb_in039_1_tud\2012\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
+C:\Dropbox\Oktatás\ngb_in039_1_tud\2012\ROSBridgeDotNet\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.xml
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb
