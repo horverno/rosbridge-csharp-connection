@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+      <head>
+	<title>Turtlesim</title>
+	<meta charset="utf-8"/>
+        <script type="text/javascript" src="ros.js"></script>
+       	<script type="text/javascript">
+		/*
+			szerepelhet külön fájlban is, ez esetben a 7. sorba a 6. sorhoz hasonlóan kell megadni az úvonalat
+		*/
+      		function main() {
+			var historycounter = 0; /*segédváltozó a history blockban a sorszámok kiírásához*/
+      			//var connection = new ros.Connection("ws://localhost:9090"); /*alapesetben ha egyazon gépről csatlakozunk websocketen keresztül, ahol a ROS fut*/
+			var connection = new ros.Connection("ws://10.2.230.124:9090"); /*konkrét IP-vel, ha pl. VirtualBoxban fut a ROS, és a host-ról akarunk csatlakozni ( virtualbox host only adapter kell hozzá, illetve a virtuális gépnek host-only módban kell kapcsolódni a hálózatra )*/
+			var canvas = document.getElementById("turtlecanvas_content"); //canvas elem elfogása
+			var context = canvas.getContext("2d"); //canvason belüli referencia a contextre
+      			connection.setOnClose(function (e) {
+				//a kapcsolat lezárásakor írja is ki
+      				document.getElementById("history_content").innerHTML += (++historycounter)+": connection closed<br/>";
+      			});
+      			connection.setOnError(function (e) {
+				//ha hiba van, jelezze
+      				document.getElementById("history_content").innerHTML += (++historycounter)+": error!<br/>";
+     			});
+     			connection.setOnOpen(function (e) {
+				//sikeres kapcsolódás esetén...
+      				document.getElementById("history_content").innerHTML += (++historycounter)+": connected to ROS<br/>";
+				
+				context.beginPath(); //elkezdi rajzolni a vonalat
+				context.moveTo(250,250); //"teleportál" a canvas közepére
+				
+        			connection.addHandler('/turtle1/pose', function (msg) {
+					//a pose topicon kapott üzeneteknek megfelelő feladatot végez, ez esetben frissíti az Info doboz tartalmát ( X és Y - koordináták, theta - elfordulás radiánban, linear és angular velocity - egyenesvonalú mozgást illetve elfordulást jelez )
+                    			document.getElementById("position").innerHTML = "<legend>Info</legend>X: "+Math.round(msg.x*Math.pow(10,4))/Math.pow(10,4)+"<br/>"+
+											"Y: "+Math.round(msg.y*Math.pow(10,4))/Math.pow(10,4)+"<br/>"+
+											"theta: "+Math.round(msg.theta*Math.pow(10,4))/Math.pow(10,4)+"<br/>"+
+											"linear velocity: "+Math.round(msg.linear_velocity*Math.pow(10,4))/Math.pow(10,4)+"<br/>"+
+											"angular velocity: "+Math.round(msg.angular_velocity*Math.pow(10,4))/Math.pow(10,4);
+
+					var x = Math.round(msg.x*Math.pow(10,4))/Math.pow(10,4); //kerekítünk 4 tizedesre
+					var y = Math.round(msg.y*Math.pow(10,4))/Math.pow(10,4); //kerekítünk 4 tizedesre
+					var theta = Math.round(msg.theta*Math.pow(10,4))/Math.pow(10,4); //kerekítünk 4 tizedesre
+
+					context.lineTo((500/11)*x, (500/11)*(11-y)); //mivel a turtlesim és a canvas koordinátarendszerének máshol van az origója, át kell számolni a koordinátákat - a turtlesimnek "balra lent" a canvasnak pedig "balra fent"
+					context.stroke(); //körvonalat húzunk - nem pedig kitöltjük
+                		});
+
+				connection.callService('/rosjs/subscribe', '["/turtle1/pose",-1]', function(e){}); //így iratkozhatunk fel a pose topicra a rosbridge segítségével, és a kevéssel feljebb látható handler fogadja az innen kapott üzeneteket
+  				
+				// a következőkben event listenereket kapcsolunk a rajzolt nyilakra illetve a billentyűzeten találhatóakra ( vigyázat! a JS keyCode nem minden böngészőben és oprendszeren egyforma, itt a rajzolt nyíl fallback-ként is funkcionál )
+				document.getElementById("forward").onclick=function(){
+					document.getElementById("history_content").innerHTML += (++historycounter)+": forward<br/>";
+					connection.publish('/turtle1/command_velocity', 'turtlesim/Velocity', '{"linear":1, "angular":0}');
+					//így küldhetünk üzenetet a command_velocity topicba, amire a háttérben a turtlesim fel van iratkozva
+				};
+				document.getElementById("backward").onclick=function(){
+					document.getElementById("history_content").innerHTML += (++historycounter)+": backward<br/>";
+					connection.publish('/turtle1/command_velocity', 'turtlesim/Velocity', '{"linear":-1, "angular":0}');
+				};
+				document.getElementById("left").onclick=function(){
+					document.getElementById("history_content").innerHTML += (++historycounter)+":left<br/>";
+					connection.publish('/turtle1/command_velocity', 'turtlesim/Velocity', '{"linear":0, "angular":1}');
+				};
+				document.getElementById("right").onclick=function(){
+					document.getElementById("history_content").innerHTML += (++historycounter)+": right<br/>";
+					connection.publish('/turtle1/command_velocity', 'turtlesim/Velocity', '{"linear":0, "angular":-1}');
+				};
+        			document.addEventListener('keypress', function (e) {
+          				switch (e.keyCode) {
+          					case 37:
+            						//left
+            						document.getElementById("history_content").innerHTML += (++historycounter)+": left<br/>";
+							connection.publish('/turtle1/command_velocity', 'turtlesim/Velocity', '{"linear":0, "angular":1}');
+            						break;
+          					case 38:
+          						//up
+            						document.getElementById("history_content").innerHTML += (++historycounter)+": forward<br/>";
+							connection.publish('/turtle1/command_velocity', 'turtlesim/Velocity', '{"linear":1, "angular":0}');
+            						break;
+          					case 39:
+            						//right 
+            						document.getElementById("history_content").innerHTML += (++historycounter)+": right<br/>";
+							connection.publish('/turtle1/command_velocity', 'turtlesim/Velocity', '{"linear":0, "angular":-1}');
+            						break;
+          					case 40:
+           	 					//down
+            						document.getElementById("history_content").innerHTML += (++historycounter)+": backward<br/>";
+							connection.publish('/turtle1/command_velocity', 'turtlesim/Velocity', '{"linear":-1, "angular":0}');
+            						break;
+          				}
+					var objDiv = document.getElementById("history_content");
+					objDiv.scrollTop = objDiv.scrollHeight+100; //ez egy hack, hogy magától görgessen mindig az utolsó soroz a history dobozban
+        			}, true);
+			});
+      		}
+    	</script>
+	<style>
+		/*
+			stíluslap, szerepelhet külön fájlban is, ez esetben a 98. sorba a következőt kell írni az itt szereplők helyett:
+			<link rel="stylesheet" href="elerei/ut/fajlnev.css" type="text/css" />
+		*/
+		body {
+			margin: 0px;
+		}
+		#controls {
+			width: 145px;
+			height: 120px;
+			border: 1px solid #666666;
+			border-radius: 10px;
+			position: relative;
+			margin-left: 20px;
+			margin-top: 20px;
+		}
+		#controls input {
+			border: 1px solid gray;
+			border-radius: 5px;
+			text-align: center;
+		}
+		#controls input:hover {
+			cursor: pointer;
+			border: 1px solid orange;
+		}
+		#forward {
+			position: absolute;
+			top: 35px;
+			left: 65px;
+		}
+		#backward {
+			position: absolute;
+			top: 95px;
+			left: 65px;
+		}
+		#left {
+			position: absolute;
+			top: 65px;
+			left: 30px;
+		}
+		#right {
+			position: absolute;
+			top: 65px;
+			left: 100px;
+		}
+		#position {
+			width: 250px;
+			height: 120px;
+			margin: 20px 0px 0px 20px;
+			border: 1px solid gray;
+			padding: 10px;
+			border-radius: 10px;
+		}
+		#history {
+			width: 250px;
+			height: 300px;
+			margin: 20px 0px 0px 20px;
+			border: 1px solid gray;
+			padding: 10px;
+			border-radius: 10px;
+		}
+		#history_content {
+			width: 240px;
+			height: 280px;
+			overflow: auto;
+		}
+		#turtlecanvas {
+			width: 500px;
+			height: 520px;
+			padding: 10px;
+			position: absolute;
+			top: 20px;
+			left: 320px;
+			border: 1px solid gray;
+			border-radius: 10px;
+		}
+		#turtlecanvas_content {
+			width: 500px;
+			height: 500px;
+			background: royalblue;
+		}
+	</style>
+      </head>
+    <body onload="main()">
+	<!-- az onload event meghívásra kerül, amint az oldal teljes tartalma betöltődött -->
+	<fieldset id="controls">
+		<legend>Controls</legend>
+		<input type="button" id="forward" value="^" onClick="forward()"/>
+		<!-- az onclick event meghívásra kerül, ha kattintunk az adott elemen (egymás után megtörténik az onkeydown és az onkeyup event is, tehát teljes kattintásról van szó, nem csak lenyomva tartásról) -->
+		<input type="button" id="backward" value="ˇ" onClick="backward()" />
+		<input type="button" id="left" value="<" onClick="left()" />
+		<input type="button" id="right" value=">" onClick="right()" />
+	</fieldset>
+	<fieldset id="position">		
+	</fieldset>
+	<fieldset id="history">
+		<legend>History</legend>
+		<div id="history_content"></div>
+	</fieldset>
+	<fieldset id="turtlecanvas">
+		<legend>Path</legend>
+		<canvas id="turtlecanvas_content" width="500" height="500"></canvas>
+	</fieldset>
+    </body>
+    </html>
