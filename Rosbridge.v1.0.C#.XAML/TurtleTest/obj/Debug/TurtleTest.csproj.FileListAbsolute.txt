@@ -1,0 +1,13 @@
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\bin\Debug\TurtleTest.exe.config
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\bin\Debug\TurtleTest.exe
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\bin\Debug\TurtleTest.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.csprojResolveAssemblyReference.cache
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\MainWindow.baml
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\MainWindow.g.cs
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\App.g.cs
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest_MarkupCompile.cache
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.g.resources
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.Properties.Resources.resources
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.csproj.GenerateResource.Cache
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.exe
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.pdb
