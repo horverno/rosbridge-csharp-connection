@@ -11,3 +11,7 @@ F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.Propertie
 F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.csproj.GenerateResource.Cache
 F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.exe
 F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Debug\TurtleTest.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\bin\Debug\Newtonsoft.Json.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\bin\Debug\RosBridgeDotNet.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\bin\Debug\RosBridgeDotNet.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\TurtleTest\bin\Debug\Newtonsoft.Json.xml
