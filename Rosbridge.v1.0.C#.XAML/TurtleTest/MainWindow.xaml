@@ -8,11 +8,15 @@
             <TextBox x:Name="txtPort" Text="9090" Margin="2"/>
             <Button x:Name="btnConnect" Click="btnConnect_Click" Content="Connect" Background="OrangeRed" Margin="2"/>
             <StackPanel x:Name="stackControls" Margin="8">
-                <Button x:Name="btnSubscribe" Click="btnSubscribe_Click" Content="Subcribe"/>
-                <Button x:Name="btnForward" Click="btnForward_Click" Content="Forward"/>
-                <Button x:Name="btnBackward" Click="btnBackward_Click" Content="Backward"/>
-                <Button x:Name="btnLeft" Click="btnLeft_Click" Content="Left"/>
-                <Button x:Name="btnRight" Click="btnRight_Click" Content="Right"/>
+                <Button x:Name="btnSubscribe" Click="btnSubscribe_Click" Content="Subcribe" Margin="2"/>
+                <Button x:Name="btnForward" Click="btnForward_Click" Content="Forward" Margin="2"/>
+                <Button x:Name="btnBackward" Click="btnBackward_Click" Content="Backward" Margin="2"/>
+                <Button x:Name="btnLeft" Click="btnLeft_Click" Content="Left" Margin="2"/>
+                <Button x:Name="btnRight" Click="btnRight_Click" Content="Right" Margin="2"/>
+                <!--<Button x:Name="btnUpd" Click="btnUpd_Click" Content="Update" Margin="2"/>-->
+                <Label x:Name="labelX"  Content="{Binding x}" />
+                <Label x:Name="labelY" Content="{Binding msg.y}" />
+                <Label x:Name="labelTheta"  Content="{Binding receiver}" />
             </StackPanel>
         </StackPanel>
     </Grid>

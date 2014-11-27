@@ -6,6 +6,7 @@ using System.Net;
 using Newtonsoft.Json;
 using System.IO;
 using System.Net.Sockets;
+using System.ComponentModel;
 
 
 namespace RosBridgeDotNet
@@ -161,6 +162,7 @@ namespace RosBridgeDotNet
                 linear = _linear;
                 angular = _angular;
             }
+
         }
         //'{"angularVelocity":[0.1,0.1],"driveActive":[1,1],"quickStop":[0,0],"disableBrake":[1,1]}'
         // {"angularVelocity":[0.0,0.0],"driveActive":[true,false],"quickStop":[true,false],"disableBrake":[true,false]}
@@ -185,10 +187,33 @@ namespace RosBridgeDotNet
             }
         }
         //{"msg": {"y": 6.43528413772583, "x": 6.383671283721924, "linear_velocity": 0.0, "angular_velocity": 0.0, "theta": 1.3104441165924072}, "receiver": "/turtle1/pose"}
-        public class TurtlePoseResponse
+        public class TurtlePoseResponse : INotifyPropertyChanged
         {
             public TurtlePoseResponseSubMsg msg { get; set; }
             public string receiver { get; set; }
+            public TurtlePoseResponse()
+            {
+                receiver = "turtle";
+                TurtlePoseResponseSubMsg subMsg = new TurtlePoseResponseSubMsg();
+            }
+            public double X
+            {
+                get
+                {
+                    return this.msg.x;
+                }
+                set
+                {
+                    msg.x = value;
+                }
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged;
+            public void NotifyPropertyCanged(string propName)
+            {
+                if (this.PropertyChanged != null)
+                    this.PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
         //"y": 6.43528413772583, "x": 6.383671283721924, "linear_velocity": 0.0, "angular_velocity": 0.0, "theta": 1.3104441165924072}
         public class TurtlePoseResponseSubMsg
@@ -198,6 +223,10 @@ namespace RosBridgeDotNet
             public double linear_velocity { get; set; }
             public double angular_velocity { get; set; }
             public double theta { get; set; }
+            public TurtlePoseResponseSubMsg()
+            {
+                x = y = linear_velocity = angular_velocity = theta = 0;
+            }
         }
         //topic = "/sick_s300/scan";
         public class NeoResponse

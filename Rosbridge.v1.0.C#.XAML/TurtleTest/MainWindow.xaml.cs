@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -27,7 +28,10 @@ namespace TurtleTest
         private Socket _clientSocket;
         private AsyncCallback _pfnCallBack;
         private IAsyncResult _result;
-        public String _pureResponse = "";
+        private String _pureResponse = "";
+        public String _lastLine = "";
+        private RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse _responseObj = new RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse();
+        private String[] _lines;
         public class SocketPacket
         {
             public System.Net.Sockets.Socket thisSocket;
@@ -37,6 +41,7 @@ namespace TurtleTest
         {
             InitializeComponent();
             stackControls.Visibility = System.Windows.Visibility.Hidden;
+            this.DataContext = _responseObj;
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
@@ -69,12 +74,14 @@ namespace TurtleTest
                if (btnSubscribe.Content.Equals("Subcribe"))
                {
                    rosSubscMsg = new RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage("/rosbridge/subscribe", poseSubscribe);
+                   btnSubscribe.Content = "Unsubcribe";
                }
                else
                {
                    rosSubscMsg = new RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage("/rosbridge/unsubscribe", poseSubscribe);
+                   btnSubscribe.Content = "Subcribe";
                }
-               string needToSend = JsonConvert.SerializeObject(u);
+               string needToSend = JsonConvert.SerializeObject(rosSubscMsg);
                //Object objData = SerializeEventData(new EventData(richTextTxName.Text));
                //byte[] byData = System.Text.Encoding.UTF8.GetBytes(objData.ToString());
                if (_clientSocket != null)
@@ -88,27 +95,32 @@ namespace TurtleTest
            {
                MessageBox.Show(se.Message);
            }
+           Update();
        }
 
 
         private void btnForward_Click(object sender, RoutedEventArgs e)
         {
             PublishturtleMessage(1, 0);
+            Update();
         }
 
         private void btnBackward_Click(object sender, RoutedEventArgs e)
         {
             PublishturtleMessage(-1, 0);
+            Update();
         }
 
         private void btnLeft_Click(object sender, RoutedEventArgs e)
         {
             PublishturtleMessage(0, 1);
+            Update();
         }
 
         private void btnRight_Click(object sender, RoutedEventArgs e)
         {
             PublishturtleMessage(0, -1);
+            Update();
         }
         /// <summary>
         /// Return true if connection was succesful
@@ -194,33 +206,28 @@ namespace TurtleTest
                 char[] chars = new char[iRx + 1];
                 System.Text.Decoder d = System.Text.Encoding.UTF8.GetDecoder();
                 int charLen = d.GetChars(theSockId.dataBuffer, 0, iRx, chars, 0);
-                System.String szData = new System.String(chars);
+                String szData = new String(chars);
                 try
                 {
                     //RetrieveReceivedEventData(pureResponse);
-                    szData = Regex.Replace(szData, @"[^\u0000-\u007F]", string.Empty);
-                    System.Diagnostics.Debug.WriteLine(szData.ToString() + " ");
-                    //richTextRxMessage.Text = richTextRxMessage.Text + "a";
+                    szData = Regex.Replace(szData, @"[^\u0000-\u007F]", String.Empty);
+                    //System.Diagnostics.Debug.WriteLine(szData.ToString() + " ");
+                    _pureResponse = Regex.Replace(_pureResponse, @"\0", String.Empty);
+                    _pureResponse += szData;
+                    _lines = _pureResponse.Split(new String[] { "\r\n", "\n" }, StringSplitOptions.None);
+                    if (_lines[_lines.Length - 1].Contains("pose\"}"))
+                    {
+                        _lastLine = _lines[_lines.Length - 1];
+                        //MessageBox.Show(_lines[_lines.Length - 1]);
+                    }
+                    _responseObj = JsonConvert.DeserializeObject<RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse>(_lastLine);
+                    System.Diagnostics.Debug.WriteLine("x: " + _responseObj.msg.x + " y: " + _responseObj.msg.y);
 
                 }
                 catch (Exception e)
                 {
                     //MessageBox.Show(e.ToString());
                 }
-
-                //If we finished receiving the response (EventData object) from the Broker
-                //then we will recover it
-                /*if (richTextRxMessage.Text.Contains("ENDOFMESSAGE"))
-                {
-                    //Remove the flag "ENDOFMESSAGE"
-                    String pureResponse = richTextRxMessage.Text
-                        .Remove(richTextRxMessage.Text.IndexOf("ENDOFMESSAGE"), 12);
-                    RetrieveReceivedEventData(pureResponse);
-
-                    richTextBoxHistoryResponses.Text += "\n \\\\\\\\\\\\ \n Response : " + pureResponse;
-                    richTextRxMessage.Text = "";
-                }*/
-
                 WaitForData();
             }
             catch (ObjectDisposedException)
@@ -256,5 +263,22 @@ namespace TurtleTest
                 MessageBox.Show(se.Message);
             }
         }
+
+        public void Update()
+        {
+            try
+            {
+                labelX.Content = "x: " + _responseObj.msg.x;
+                labelY.Content = "y: " + _responseObj.msg.y;
+                labelTheta.Content = "t: " + _responseObj.msg.theta;
+            }
+            catch
+            {
+                labelX.Content = "x";
+                labelY.Content = "y";
+                labelTheta.Content = "t";
+            }
+        }
+
     }
 }
