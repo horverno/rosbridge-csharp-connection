@@ -3,3 +3,5 @@
 <wiki:video url="http://www.youtube.com/watch?v=cVuTH-KwDqA"/>
 
 [http://www.youtube.com/watch?v=cVuTH-KwDqA youtu.be/cVuTH-KwDqA]
+
+In the video the [http://nootrix.com/downloads/ NooTrix] ROS Fuerte pre-installed virtualbox was used.
