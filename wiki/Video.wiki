@@ -1,0 +1,5 @@
+=Video=
+
+<wiki:video url="http://www.youtube.com/watch?v=cVuTH-KwDqA"/>
+
+[http://www.youtube.com/watch?v=cVuTH-KwDqA youtu.be/cVuTH-KwDqA]
