@@ -30,21 +30,23 @@ namespace RosBridgeDotNet
         /// <param name="port">The port address to connect to. By default it is set to 9090.</param>
         public RosBridgeDotNet(string IpAddress, int port = 9090)
         {
-            try
-            {
-                byte[] handShake = Encoding.UTF8.GetBytes("raw\r\n\r\n");
-                _IPEndPoint = new IPEndPoint(IPAddress.Parse(IpAddress), port);
-                _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                _socket.Connect(_IPEndPoint);
-                _socket.Send(handShake);
-                Connected = true;
-            }
-            catch (Exception)
-            {
-                Connected = false;
-                //throw new ConnectionException();
-            }
+            #region Old code, needs refactor
+            //try
+            //{
+            //    byte[] handShake = Encoding.UTF8.GetBytes("raw\r\n\r\n");
+            //    _IPEndPoint = new IPEndPoint(IPAddress.Parse(IpAddress), port);
+            //    _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            //    _socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
+            //    _socket.Connect(_IPEndPoint);
+            //    _socket.Send(handShake);
+            //    Connected = true;
+            //}
+            //catch (Exception)
+            //{
+            //    Connected = false;
+            //    //throw new ConnectionException();
+            //}
+            #endregion
         }
 
         /// <summary>
@@ -186,6 +188,7 @@ namespace RosBridgeDotNet
                 System.Diagnostics.Debug.WriteLine(JsonConvert.SerializeObject(o));
             }
         }
+        #region region TurtleResponse class andd subclasses
         //{"msg": {"y": 6.43528413772583, "x": 6.383671283721924, "linear_velocity": 0.0, "angular_velocity": 0.0, "theta": 1.3104441165924072}, "receiver": "/turtle1/pose"}
         public class TurtlePoseResponse : INotifyPropertyChanged
         {
@@ -228,11 +231,69 @@ namespace RosBridgeDotNet
                 x = y = linear_velocity = angular_velocity = theta = 0;
             }
         }
-        //topic = "/sick_s300/scan";
+        #endregion
+
+        #region region NeoResponse class andd subclasses
+        public class NeoStamp
+        {
+            public int nsecs { get; set; }
+            public int secs { get; set; }
+        }
+
+        public class NeoHeader
+        {
+            public NeoStamp stamp { get; set; }
+            public string frame_id { get; set; }
+            public int seq { get; set; }
+        }
+
+        public class NeoMsg
+        {
+            public double angle_min { get; set; }
+            public double angle_max { get; set; }
+            public int scan_time { get; set; }
+            public double range_min { get; set; }
+            public double time_increment { get; set; }
+            public List<int> intensities { get; set; }
+            public List<double> ranges { get; set; }
+            public int range_max { get; set; }
+            public NeoHeader header { get; set; }
+            public double angle_increment { get; set; }
+        }
+
+
+        /// <summary>
+        ///NeoRecponse class as JSON:
+        ///"receiver":"/sick_s300/scan",
+        ///"msg":
+        ///{
+        ///    "angle_min": -2.356194496154785,
+        ///    "angle_max":2.356194496154785,
+        ///    "scan_time":0,
+        ///    "range_min":0.0010000000474974513,
+        ///    "time_increment":-4.621072002919391E-5,
+        ///    "intensities":[0,0,0,0],
+        ///    "ranges":[0.07999999821186066,0.09000000357627869,0.07000000029802322],
+        ///    "range_max":30,
+        ///    "header":
+        ///    {
+        ///        "stamp":
+        ///        {
+        ///            "nsecs":237722438,
+        ///            "secs":1353605911
+        ///        },
+        ///        "frame_id":"/base_laser_link",
+        ///        "seq":1361
+        ///    },
+        ///"angle_increment":0.008726646192371845
+        ///}
+        /// </summary>
         public class NeoResponse
         {
-            //todo
+            public string receiver { get; set; }
+            public NeoMsg msg { get; set; }
         }
+        #endregion
         public class FreeString
         {
             public string command { get; set; }

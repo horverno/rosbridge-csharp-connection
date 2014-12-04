@@ -1,0 +1,17 @@
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\bin\Debug\NeobotixTest.exe.config
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeobotixTest.csprojResolveAssemblyReference.cache
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeoMainWindow.baml
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeoMainWindow.g.cs
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\App.g.cs
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeobotixTest_MarkupCompile.cache
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeobotixTest.g.resources
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeobotixTest.Properties.Resources.resources
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeobotixTest.csproj.GenerateResource.Cache
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\bin\Debug\NeobotixTest.exe
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\bin\Debug\NeobotixTest.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\bin\Debug\Newtonsoft.Json.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\bin\Debug\RosBridgeDotNet.dll
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\bin\Debug\RosBridgeDotNet.pdb
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\bin\Debug\Newtonsoft.Json.xml
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeobotixTest.exe
+F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\NeobotixTest\obj\Debug\NeobotixTest.pdb
