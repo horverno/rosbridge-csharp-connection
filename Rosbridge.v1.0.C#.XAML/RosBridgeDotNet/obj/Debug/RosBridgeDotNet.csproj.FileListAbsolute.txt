@@ -12,3 +12,10 @@ F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\Newtonsoft.Json
 F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
 F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb
 F:\RosBrigdgeC#\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
+E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.dll
+E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.pdb
+E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.dll
+E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.xml
+E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
+E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
+E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb

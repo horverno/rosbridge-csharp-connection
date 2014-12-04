@@ -71,15 +71,15 @@ namespace NeobotixTest
             RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage rosSubscMsg;
             try
             {
-                object[] poseSubscribe = { "/turtle1/pose", 500 };
+                object[] laserSubscribe = { "/sick_s300/scan", 500 };
                 if (btnSubscribe.Content.Equals("Subcribe"))
                 {
-                    rosSubscMsg = new RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage("/rosbridge/subscribe", poseSubscribe);
+                    rosSubscMsg = new RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage("/rosbridge/subscribe", laserSubscribe);
                     btnSubscribe.Content = "Unsubcribe";
                 }
                 else
                 {
-                    rosSubscMsg = new RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage("/rosbridge/unsubscribe", poseSubscribe);
+                    rosSubscMsg = new RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage("/rosbridge/unsubscribe", laserSubscribe);
                     btnSubscribe.Content = "Subcribe";
                 }
                 string needToSend = JsonConvert.SerializeObject(rosSubscMsg);
@@ -96,33 +96,22 @@ namespace NeobotixTest
             {
                 MessageBox.Show(se.Message);
             }
-            Update();
+            //Update();
         }
 
 
         private void btnForward_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(1, 0);
-            Update();
+            PublishNeoMessage(1, 0);
+            //Update();
         }
 
         private void btnBackward_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(-1, 0);
+            //PublishNeoMessage(-1, 0);
             Update();
         }
 
-        private void btnLeft_Click(object sender, RoutedEventArgs e)
-        {
-            PublishturtleMessage(0, 1);
-            Update();
-        }
-
-        private void btnRight_Click(object sender, RoutedEventArgs e)
-        {
-            PublishturtleMessage(0, -1);
-            Update();
-        }
         /// <summary>
         /// Return true if connection was succesful
         /// </summary>
@@ -216,13 +205,20 @@ namespace NeobotixTest
                     _pureResponse = Regex.Replace(_pureResponse, @"\0", String.Empty);
                     _pureResponse += szData;
                     _lines = _pureResponse.Split(new String[] { "\r\n", "\n" }, StringSplitOptions.None);
-                    if (_lines[_lines.Length - 1].Contains("pose\"}"))
+                    if (_lines[_lines.Length - 1].Contains("/sick_s300/scan\"}"))
                     {
                         _lastLine = _lines[_lines.Length - 1];
                         //MessageBox.Show(_lines[_lines.Length - 1]);
+                        _responseObj = JsonConvert.DeserializeObject<RosBridgeDotNet.RosBridgeDotNet.NeoResponse>(_lastLine);
+                        //_responseObj.msg.ranges.ForEach(delegate(double name)
+                        //{
+                        //    if (name == 0)
+                        //        System.Diagnostics.Debug.Write("x");
+                        //    else
+                        //        System.Diagnostics.Debug.WriteLine(name.ToString());
+                        //});
                     }
-                    _responseObj = JsonConvert.DeserializeObject<RosBridgeDotNet.RosBridgeDotNet.NeoResponse>(_lastLine);
-                    System.Diagnostics.Debug.WriteLine("intensities: " + _responseObj.msg.intensities + " : " + _responseObj.ToString(););
+
 
                 }
                 catch (Exception e)
@@ -241,17 +237,30 @@ namespace NeobotixTest
             }
         }
 
-        private void PublishturtleMessage(double linear, double angular)
+        private void PublishNeoMessage(double linear, double angular)
         {
             try
             {
-                string topic = "/turtle1/command_velocity";
-                string msgtype = "turtlesim/Velocity";
-                RosBridgeDotNet.RosBridgeDotNet.TurtleSim turtleGo1 = new RosBridgeDotNet.RosBridgeDotNet.TurtleSim(linear, angular);
-                RosBridgeDotNet.RosBridgeDotNet.PublishMessage m = new RosBridgeDotNet.RosBridgeDotNet.PublishMessage(topic, msgtype, turtleGo1);
+                string topic = "/DriveCommands";
+                string msgtype = "neo_serrelayboard/DriveCommands";
+                double[] speed1 = { 0.1, 0.1 };
+                double[] speed0 = { 0.0, 0.0 };
+                bool[] trueArr = { true, true };
+                bool[] falseArr = { false, false };
+                RosBridgeDotNet.RosBridgeDotNet.NeobotixRefSpeed neoGo1 = new RosBridgeDotNet.RosBridgeDotNet.NeobotixRefSpeed(speed1, trueArr, falseArr, trueArr);
+                RosBridgeDotNet.RosBridgeDotNet.NeobotixRefSpeed neoGo0 = new RosBridgeDotNet.RosBridgeDotNet.NeobotixRefSpeed(speed0, trueArr, falseArr, trueArr);
+                RosBridgeDotNet.RosBridgeDotNet.PublishMessage m = new RosBridgeDotNet.RosBridgeDotNet.PublishMessage(topic, msgtype, neoGo1);
                 string needToSend = JsonConvert.SerializeObject(m);
                 //Object objData = SerializeEventData(new EventData(richTextTxName.Text));
                 //byte[] byData = System.Text.Encoding.UTF8.GetBytes(objData.ToString());
+                if (_clientSocket != null)
+                {
+                    _clientSocket.Send(new byte[] { 0 });    // \x00
+                    _clientSocket.Send(Encoding.UTF8.GetBytes(needToSend));
+                    _clientSocket.Send(new byte[] { 255 });    // \xff
+                }
+                m = new RosBridgeDotNet.RosBridgeDotNet.PublishMessage(topic, msgtype, neoGo0); //stop
+                needToSend = JsonConvert.SerializeObject(m);
                 if (_clientSocket != null)
                 {
                     _clientSocket.Send(new byte[] { 0 });    // \x00
@@ -267,9 +276,24 @@ namespace NeobotixTest
 
         public void Update()
         {
+            double x, y;
+            int density = 360, i = 0;
             try
             {
-                labelX.Content = "x: " + _responseObj.msg.intensities;
+                _responseObj.msg.ranges.ForEach(delegate(double actualMeasure)
+                {
+
+                    if (actualMeasure == 0)
+                        System.Diagnostics.Debug.Write("x");
+                    else
+                    {
+                        i++;
+                        x = Math.Cos((Math.PI / density * i) + 1.0 * Math.PI) * (100 * actualMeasure);
+                        y = Math.Sin((Math.PI / density * i) + 1.0 * Math.PI) * (100 * actualMeasure);
+                        DrawLine(x, y);
+                    }
+                });
+                //labelX.Content = "x: " + _responseObj.msg.intensities;
 
             }
             catch
@@ -277,6 +301,23 @@ namespace NeobotixTest
                 labelX.Content = "x";
 
             }
+        }
+        private void DrawLine(double x, double y)
+        {
+            canvLaser.Children.Add(new Line
+            {
+                Stroke = System.Windows.Media.Brushes.DarkGray,
+                StrokeThickness = 2,
+                X1 = 150,
+                Y1 = 150,
+                X2 = (int)(150 + x),
+                Y2 = (int)(150 + y)
+            });
+        }
+
+        private void btnClear_Click_1(object sender, RoutedEventArgs e)
+        {
+            canvLaser.Children.Clear();
         }
 
     }

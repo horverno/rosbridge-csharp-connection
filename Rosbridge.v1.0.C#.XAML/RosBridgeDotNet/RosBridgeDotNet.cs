@@ -168,14 +168,14 @@ namespace RosBridgeDotNet
         }
         //'{"angularVelocity":[0.1,0.1],"driveActive":[1,1],"quickStop":[0,0],"disableBrake":[1,1]}'
         // {"angularVelocity":[0.0,0.0],"driveActive":[true,false],"quickStop":[true,false],"disableBrake":[true,false]}
-        public class Neobotix
+        public class NeobotixRefSpeed
         {
             public double[] angularVelocity { get; set; }
             public bool[] driveActive { get; set; }
             public bool[] quickStop { get; set; }
             public bool[] disableBrake { get; set; }
 
-            public Neobotix(double[] _angularVelocity, bool[] _driveActive, bool[] _quickStop, bool[] _disableBrake)
+            public NeobotixRefSpeed(double[] _angularVelocity, bool[] _driveActive, bool[] _quickStop, bool[] _disableBrake)
             {
                 angularVelocity = _angularVelocity;
                 driveActive = _driveActive;
@@ -251,12 +251,12 @@ namespace RosBridgeDotNet
         {
             public double angle_min { get; set; }
             public double angle_max { get; set; }
-            public int scan_time { get; set; }
+            public double scan_time { get; set; }
             public double range_min { get; set; }
             public double time_increment { get; set; }
-            public List<int> intensities { get; set; }
+            public List<double> intensities { get; set; }
             public List<double> ranges { get; set; }
-            public int range_max { get; set; }
+            public double range_max { get; set; }
             public NeoHeader header { get; set; }
             public double angle_increment { get; set; }
         }
