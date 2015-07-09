@@ -58,19 +58,27 @@ namespace RosBridgeUtility
         WebSocket ws;
         JObject lastMessage;
         IROSBridgeController subject;
+        List<String> CollectedData;
 
 
+        public void Initialize(String ipaddress)
+        {
+            ws = new WebSocket(ipaddress);            
+        }
 
         public void Initialize(String ipaddress, IROSBridgeController parentwindow)
         {
             ws = new WebSocket(ipaddress);
             subject = parentwindow;
             ws.OnMessage += UpdateOnReceive;
+            Console.Out.WriteLine("Initialized RosBridgeLogic component");
+            
         }
 
         public void Connect()
         {
             ws.Connect();
+            Console.Out.WriteLine("Successfully connected to: {0}", ws.Url);
         }
 
         public void Disconnect()
@@ -79,6 +87,25 @@ namespace RosBridgeUtility
             {
                 ws.Close();
             }
+        }
+
+        public void CollectData(Object Sender, MessageEventArgs a)
+        {
+            CollectedData.Add(a.Data);
+        }
+
+        public void StartCollect(String topic)
+        {
+            sendSubscription(topic);
+            CollectedData = new List<string>();
+            ws.OnMessage += CollectData;
+        }
+
+        public List<String> StopCollection(String topic)
+        {
+            sendSubscription(topic);
+            ws.OnMessage -= CollectData;
+            return CollectedData;
         }
 
         public void sendSubscription(String topic)
@@ -106,9 +133,19 @@ namespace RosBridgeUtility
             ws.Send(jsondata.ToString());
         }
 
+        public void setSubject(IROSBridgeController _subject)
+        {
+            this.subject = _subject;
+        }
+
         public void UpdateOnReceive(Object Sender, MessageEventArgs e)
         {
             subject.ReceiveUpdate(e.Data);
+        }
+
+        public String getUrl()
+        {
+            return ws.Url.ToString();
         }
 
         public void AddMessageEventListener(EventHandler<WebSocketSharp.MessageEventArgs> a)

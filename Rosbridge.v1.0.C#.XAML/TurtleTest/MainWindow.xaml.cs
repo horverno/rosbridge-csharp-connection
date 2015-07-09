@@ -30,11 +30,7 @@ namespace TurtleTest
         RosBridgeUtility.RosBridgeLogic bridgeLogic;
 
 
-        private AsyncCallback _pfnCallBack;
-        private String _pureResponse = "";
-        public String _lastLine = "";
         private RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse _responseObj = new RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse();
-        private String[] _lines;
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
         enum ConnectionState
@@ -47,13 +43,7 @@ namespace TurtleTest
             Unsubscribed = 0, Subscribed
         }
         int subscriptionState;
-
-
-        public class SocketPacket
-        {
-            public System.Net.Sockets.Socket thisSocket;
-            public byte[] dataBuffer = new byte[1];
-        }
+       
         public MainWindow()
         {
             InitializeComponent();
@@ -62,6 +52,7 @@ namespace TurtleTest
             this.bridgeLogic = new RosBridgeUtility.RosBridgeLogic();
             this.connectionState = (int)ConnectionState.Disconnected;
             this.subscriptionState = (int)SubscriptionState.Unsubscribed;
+            bridgeLogic.setSubject(this);
         }
         
 
@@ -151,20 +142,7 @@ namespace TurtleTest
         /// <returns></returns>
         /// 
 
-        private static void ConnectCallback(IAsyncResult ar)
-        {
-            try 
-            {
-                Socket client = (Socket) ar.AsyncState;
-                client.EndConnect(ar);
-               
-                connectDone.Set();
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine(e.ToString());
-            }
-        }
+        
 
         bool ConnectToRos()
         {
@@ -190,69 +168,7 @@ namespace TurtleTest
         {
             bridgeLogic.Disconnect();
         }
-        public void WaitForData()
-        {
-            try
-            {
-                if (_pfnCallBack == null)
-                {
-                    _pfnCallBack = new AsyncCallback(OnDataReceived);
-                }
-                SocketPacket theSocPkt = new SocketPacket();                
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message);
-            }
-            catch (NullReferenceException ne)
-            {
-                MessageBox.Show(ne.Message);
-            }
-
-        }
-        public void OnDataReceived(IAsyncResult asyn)
-        {
-            try
-            {
-                SocketPacket theSockId = (SocketPacket)asyn.AsyncState;
-                int iRx = theSockId.thisSocket.EndReceive(asyn);
-                char[] chars = new char[iRx + 1];
-                System.Text.Decoder d = System.Text.Encoding.UTF8.GetDecoder();
-                int charLen = d.GetChars(theSockId.dataBuffer, 0, iRx, chars, 0);
-                String szData = new String(chars);
-                try
-                {
-                    //RetrieveReceivedEventData(pureResponse);
-                    szData = Regex.Replace(szData, @"[^\u0000-\u007F]", String.Empty);
-                    //System.Diagnostics.Debug.WriteLine(szData.ToString() + " ");
-                    _pureResponse = Regex.Replace(_pureResponse, @"\0", String.Empty);
-                    _pureResponse += szData;
-                    _lines = _pureResponse.Split(new String[] { "\r\n", "\n" }, StringSplitOptions.None);
-                    if (_lines[_lines.Length - 1].Contains("pose\"}"))
-                    {
-                        _lastLine = _lines[_lines.Length - 1];
-                        //MessageBox.Show(_lines[_lines.Length - 1]);
-                    }
-                    _responseObj = JsonConvert.DeserializeObject<RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse>(_lastLine);
-                    System.Diagnostics.Debug.WriteLine("x: " + _responseObj.msg.x + " y: " + _responseObj.msg.y);
-
-                }
-                catch (Exception e)
-                {
-                   MessageBox.Show(e.ToString());
-                }
-                WaitForData();
-            }
-            catch (ObjectDisposedException)
-            {
-                System.Diagnostics.Debugger.Log(0, "1", "\nOnDataReceived: Socket has been closed\n");
-            }
-            catch (SocketException se)
-            {
-                MessageBox.Show(se.Message);
-            }
-        }
-
+                
         private void PublishturtleMessage(double linear, double angular)
         {
             try
