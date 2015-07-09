@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TurtleTest.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Rosbridge turtle test" Height="400" Width="600">
+        Title="Rosbridge turtle test" MinHeight="480" Height="480" Width="600">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>

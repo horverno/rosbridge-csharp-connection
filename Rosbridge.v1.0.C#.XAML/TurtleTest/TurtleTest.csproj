@@ -39,7 +39,7 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.6.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\..\ROSTalker\RosBridgeApplication\packages\Newtonsoft.Json.3.5.8\lib\35\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -63,8 +63,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="IROSBridgeController.cs" />
-    <Compile Include="RosBridgeLogic.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -110,6 +108,10 @@
     <ProjectReference Include="..\RosBridgeDotNet\RosBridgeDotNet.csproj">
       <Project>{c0820396-5110-46da-91ed-713126c01c84}</Project>
       <Name>RosBridgeDotNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RosBridgeUtility\RosBridgeUtility.csproj">
+      <Project>{9c773744-39c9-4c2f-9dcf-06b469b89555}</Project>
+      <Name>RosBridgeUtility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -25,9 +25,9 @@ namespace TurtleTest
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, IROSBridgeController
+    public partial class MainWindow : Window, RosBridgeUtility.IROSBridgeController
     {
-        RosBridgeLogic bridgeLogic;
+        RosBridgeUtility.RosBridgeLogic bridgeLogic;
 
 
         private AsyncCallback _pfnCallBack;
@@ -59,7 +59,7 @@ namespace TurtleTest
             InitializeComponent();
             stackControls.Visibility = System.Windows.Visibility.Hidden;
             this.DataContext = _responseObj;
-            this.bridgeLogic = new RosBridgeLogic();
+            this.bridgeLogic = new RosBridgeUtility.RosBridgeLogic();
             this.connectionState = (int)ConnectionState.Disconnected;
             this.subscriptionState = (int)SubscriptionState.Unsubscribed;
         }
