@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,6 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -23,15 +25,30 @@ namespace TurtleTest
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IROSBridgeController
     {
-        private Socket _clientSocket;
+        RosBridgeLogic bridgeLogic;
+
+
         private AsyncCallback _pfnCallBack;
-        private IAsyncResult _result;
         private String _pureResponse = "";
         public String _lastLine = "";
         private RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse _responseObj = new RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse();
         private String[] _lines;
+        private static ManualResetEvent connectDone = new ManualResetEvent(false);
+        private static ManualResetEvent sendDone = new ManualResetEvent(false);
+        enum ConnectionState
+        {
+            Disconnected = 0, Connected
+        }
+        int connectionState;
+        enum SubscriptionState
+        {
+            Unsubscribed = 0, Subscribed
+        }
+        int subscriptionState;
+
+
         public class SocketPacket
         {
             public System.Net.Sockets.Socket thisSocket;
@@ -42,23 +59,29 @@ namespace TurtleTest
             InitializeComponent();
             stackControls.Visibility = System.Windows.Visibility.Hidden;
             this.DataContext = _responseObj;
+            this.bridgeLogic = new RosBridgeLogic();
+            this.connectionState = (int)ConnectionState.Disconnected;
+            this.subscriptionState = (int)SubscriptionState.Unsubscribed;
         }
+        
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (btnConnect.Content.Equals("Connect"))
+     
+            if (connectionState==(int)(ConnectionState.Disconnected))
             {
                 if (ConnectToRos())
                 {
+                    connectionState = (int)ConnectionState.Connected;
                     btnConnect.Background = Brushes.LightGreen;
-                    btnConnect.Content = "Disonnect";
+                    btnConnect.Content = "Disconnect";
                     stackControls.Visibility = System.Windows.Visibility.Visible;
                 }
             }
             else
             {
-
                 DisconnectFromRos();
+                connectionState = (int)ConnectionState.Disconnected;
                 btnConnect.Background = Brushes.OrangeRed;
                 btnConnect.Content = "Connect";
                 stackControls.Visibility = System.Windows.Visibility.Hidden;
@@ -67,108 +90,105 @@ namespace TurtleTest
 
         private void btnSubscribe_Click(object sender, RoutedEventArgs e)
         {
-           RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage rosSubscMsg;
-           try
-           {
-               object[] poseSubscribe = { "/turtle1/pose", 500 };
-               if (btnSubscribe.Content.Equals("Subcribe"))
-               {
-                   rosSubscMsg = new RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage("/rosbridge/subscribe", poseSubscribe);
-                   btnSubscribe.Content = "Unsubcribe";
-               }
-               else
-               {
-                   rosSubscMsg = new RosBridgeDotNet.RosBridgeDotNet.SubscribeMessage("/rosbridge/unsubscribe", poseSubscribe);
-                   btnSubscribe.Content = "Subcribe";
-               }
-               string needToSend = JsonConvert.SerializeObject(rosSubscMsg);
-               //Object objData = SerializeEventData(new EventData(richTextTxName.Text));
-               //byte[] byData = System.Text.Encoding.UTF8.GetBytes(objData.ToString());
-               if (_clientSocket != null)
-               {
-                   _clientSocket.Send(new byte[] { 0 });    // \x00
-                   _clientSocket.Send(Encoding.UTF8.GetBytes(needToSend));
-                   _clientSocket.Send(new byte[] { 255 });    // \xff
-               }
-           }
-           catch (SocketException se)
-           {
-               MessageBox.Show(se.Message);
-           }
-           Update();
-       }
+            if (subscriptionState == (int)SubscriptionState.Unsubscribed)
+            {
+                try
+                {
+                    bridgeLogic.sendSubscription("/turtle1/pose");
+                    subscriptionState = (int)SubscriptionState.Subscribed;
+                    btnSubscribe.Content = "Unsubscribe";
+                }
+                catch (Exception se)
+                {
+                    MessageBox.Show(se.Message);
+                }
+            }
+            else
+            {
+                try
+                {
+                    bridgeLogic.sendUnsubscribe("/turtle1/pose");
+                    subscriptionState = (int)SubscriptionState.Unsubscribed;
+                    btnSubscribe.Content = "Subscribe";
+                }
+                catch (Exception se)
+                {
+                    MessageBox.Show(se.Message);
+                }
+            }
+        }
 
+        private double convertTextBlocktoRadians()
+        {
+            double deg = Double.Parse(txtTheta.Text);
+            return deg * Math.PI / 180.0;
+        }
 
         private void btnForward_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(1, 0);
-            Update();
+            PublishturtleMessage(Double.Parse(txtLgth.Text), 0);
         }
 
         private void btnBackward_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(-1, 0);
-            Update();
+            PublishturtleMessage(-Double.Parse(txtLgth.Text), 0);
         }
 
         private void btnLeft_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(0, 1);
-            Update();
+
+            PublishturtleMessage(Double.Parse(txtLgth.Text), convertTextBlocktoRadians());
         }
 
         private void btnRight_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(0, -1);
-            Update();
+            PublishturtleMessage(Double.Parse(txtLgth.Text), -convertTextBlocktoRadians());
+            //Update();
         }
         /// <summary>
         /// Return true if connection was succesful
         /// </summary>
         /// <returns></returns>
+        /// 
+
+        private static void ConnectCallback(IAsyncResult ar)
+        {
+            try 
+            {
+                Socket client = (Socket) ar.AsyncState;
+                client.EndConnect(ar);
+               
+                connectDone.Set();
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine(e.ToString());
+            }
+        }
+
         bool ConnectToRos()
         {
-            // See if we have text on the IP and Port text fields
             if (txtIP.Text == "" || txtPort.Text == "")
             {
                 MessageBox.Show("IP Address and Port Number are required to connect to the Server\n");
                 return false;
             }
+            
             try
             {
-                _clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                // Cet the remote IP address
-                IPAddress ip = IPAddress.Parse(txtIP.Text);
-                int iPortNo = System.Convert.ToInt16(txtPort.Text);
-                // Create the end point 
-                IPEndPoint ipEnd = new IPEndPoint(ip, iPortNo);
-                // Connect to the remote host
-                _clientSocket.Connect(ipEnd);
-                if (_clientSocket.Connected)
-                {
-                    //Wait for data asynchronously 
-                    WaitForData();
-                }
-                _clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-                byte[] handShake = Encoding.UTF8.GetBytes("raw\r\n\r\n");
-                _clientSocket.Send(handShake);
+                bridgeLogic.Initialize("ws://" + txtIP.Text + ":" + txtPort.Text, this);
+                bridgeLogic.Connect();
                 return true;
             }
-            catch (SocketException se)
+            catch (Exception e)
             {
-                string str;
-                str = "\nConnection failed, is the server running?\n" + se.Message;
-                MessageBox.Show(str);
+                MessageBox.Show(e.ToString());
                 return false;
             }
         }
         void DisconnectFromRos()
         {
-            if (_clientSocket != null)
-            {
-                _clientSocket.Close();
-                _clientSocket = null;
-            }
+            bridgeLogic.Disconnect();
         }
         public void WaitForData()
         {
@@ -178,14 +198,7 @@ namespace TurtleTest
                 {
                     _pfnCallBack = new AsyncCallback(OnDataReceived);
                 }
-                SocketPacket theSocPkt = new SocketPacket();
-                theSocPkt.thisSocket = _clientSocket;
-                // Start listening to the data asynchronously
-                _result = _clientSocket.BeginReceive(theSocPkt.dataBuffer,
-                                                        0, theSocPkt.dataBuffer.Length,
-                                                        SocketFlags.None,
-                                                        _pfnCallBack,
-                                                        theSocPkt);
+                SocketPacket theSocPkt = new SocketPacket();                
             }
             catch (SocketException se)
             {
@@ -226,7 +239,7 @@ namespace TurtleTest
                 }
                 catch (Exception e)
                 {
-                    //MessageBox.Show(e.ToString());
+                   MessageBox.Show(e.ToString());
                 }
                 WaitForData();
             }
@@ -244,19 +257,9 @@ namespace TurtleTest
         {
             try
             {
-                string topic = "/turtle1/command_velocity";
-                string msgtype = "turtlesim/Velocity";
-                RosBridgeDotNet.RosBridgeDotNet.TurtleSim turtleGo1 = new RosBridgeDotNet.RosBridgeDotNet.TurtleSim(linear, angular);
-                RosBridgeDotNet.RosBridgeDotNet.PublishMessage m = new RosBridgeDotNet.RosBridgeDotNet.PublishMessage(topic, msgtype, turtleGo1);
-                string needToSend = JsonConvert.SerializeObject(m);
-                //Object objData = SerializeEventData(new EventData(richTextTxName.Text));
-                //byte[] byData = System.Text.Encoding.UTF8.GetBytes(objData.ToString());
-                if (_clientSocket != null)
-                {
-                    _clientSocket.Send(new byte[] { 0 });    // \x00
-                    _clientSocket.Send(Encoding.UTF8.GetBytes(needToSend));
-                    _clientSocket.Send(new byte[] { 255 });    // \xff
-                }
+                var v = new { linear = linear, angular = angular };
+                bridgeLogic.sendPublish("/turtle1/command_velocity", 
+                    JObject.Parse(JsonConvert.SerializeObject(v)));
             }
             catch (SocketException se)
             {
@@ -264,21 +267,17 @@ namespace TurtleTest
             }
         }
 
-        public void Update()
+        public delegate void UpdateTextElements(String data);
+
+        public void ReceiveUpdate(String data)
         {
-            try
-            {
-                labelX.Content = "x: " + _responseObj.msg.x;
-                labelY.Content = "y: " + _responseObj.msg.y;
-                labelTheta.Content = "t: " + _responseObj.msg.theta;
-            }
-            catch
-            {
-                labelX.Content = "x";
-                labelY.Content = "y";
-                labelTheta.Content = "t";
-            }
+            JObject jsonData = JObject.Parse(data);
+            Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + jsonData["msg"]["x"]));
+            Dispatcher.Invoke(new Action(() => labelY.Content = "y: " + jsonData["msg"]["y"]));
+            Dispatcher.Invoke(new Action(() => labelTheta.Content = "t: " + jsonData["msg"]["theta"] +
+                " (Deg: " + Math.Round((float)jsonData["msg"]["theta"] * 180 / Math.PI, 4).ToString() + ")"));
         }
+        
 
     }
 }
