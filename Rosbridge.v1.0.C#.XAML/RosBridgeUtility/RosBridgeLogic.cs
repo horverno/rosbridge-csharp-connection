@@ -1,7 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -58,8 +61,7 @@ namespace RosBridgeUtility
         WebSocket ws;
         JObject lastMessage;
         IROSBridgeController subject;
-        List<String> CollectedData;
-
+        List<Tuple<String, String>> CollectedData;
 
         public void Initialize(String ipaddress)
         {
@@ -91,19 +93,29 @@ namespace RosBridgeUtility
 
         public void CollectData(Object Sender, MessageEventArgs a)
         {
-            CollectedData.Add(a.Data);
+            JObject jData = JObject.Parse(a.Data);
+            CollectedData.Add(new Tuple<String, String>(jData["topic"].ToString(),
+                jData["msg"].ToString()));
         }
 
-        public void StartCollect(String topic)
+        public void initializeCollection()
         {
-            sendSubscription(topic);
-            CollectedData = new List<string>();
+            CollectedData = new List<Tuple<string,string>>();
             ws.OnMessage += CollectData;
         }
 
-        public List<String> StopCollection(String topic)
+        public void StartCollection(String topic)
         {
             sendSubscription(topic);
+        }
+
+        public void RemoveCollection(String topic)
+        {
+            sendUnsubscribe(topic);            
+        }
+
+        public List<Tuple<String, String>> StopCollection()
+        {
             ws.OnMessage -= CollectData;
             return CollectedData;
         }
@@ -111,7 +123,7 @@ namespace RosBridgeUtility
         public void sendSubscription(String topic)
         {
             SubscribeMessage sub1 = new SubscribeMessage(topic);
-            ws.Send(JsonConvert.SerializeObject(sub1).ToString());
+            ws.Send(JsonConvert.SerializeObject(sub1).ToString());            
         }
 
         public void sendUnsubscribe(String topic)
@@ -123,6 +135,14 @@ namespace RosBridgeUtility
         public void ReceiveData(Object Sender, MessageEventArgs e)
         {
             lastMessage = JObject.Parse(e.Data);
+        }
+
+        public void sendPublish(String topic, String msg)
+        {
+            PublishMessage pub1 = new PublishMessage(topic);
+            JObject jsondata = JObject.Parse(JsonConvert.SerializeObject(pub1));
+            jsondata["msg"] = msg;
+            ws.Send(jsondata.ToString());
         }
 
         public void sendPublish(String topic, JObject msg)
@@ -151,6 +171,45 @@ namespace RosBridgeUtility
         public void AddMessageEventListener(EventHandler<WebSocketSharp.MessageEventArgs> a)
         {
             ws.OnMessage += a;
+        }
+
+        public List<T> projectionResponse<T>(String topic, String field)
+        {
+            List<T> resp = new List<T>();
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            foreach (var item in CollectedData.Where(
+                s => s.Item1.Equals("\""+topic+"\"")))
+            {
+                JObject firstElement = JObject.Parse(item.Item2);
+                resp.Add((T)converter.ConvertFromString(null, 
+                    CultureInfo.CreateSpecificCulture("en-US"), 
+                    (firstElement[field]).ToString()));                
+            }
+            return resp;
+        }
+
+        public System.Collections.IList getResponseAttribute(String topic, String field)
+        {
+            JObject firstElement = JObject.Parse(
+                CollectedData.First(s => s.Item1.Equals("\""+topic+"\"") ).Item2);
+            bool test;
+            int testInt;
+            double testDouble;
+            if (Boolean.TryParse((firstElement[field]).ToString(),out test))
+            {
+                return projectionResponse<Boolean>(topic,field);
+            }
+            else if (Int32.TryParse((firstElement[field]).ToString(), out testInt))
+            {
+                return projectionResponse<Int32>(topic,field);
+            }
+            else if (Double.TryParse((firstElement[field]).ToString(),
+                NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"),
+                out testDouble))
+            {
+                return projectionResponse<Double>(topic,field);
+            }
+            return null;
         }
     }
 }

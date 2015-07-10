@@ -27,5 +27,8 @@
                 <Label x:Name="labelTheta"  Content="{Binding receiver}" />
             </StackPanel>
         </StackPanel>
+        <Rectangle x:Name="color_sensor_feedback" Grid.Column="1">
+            
+        </Rectangle>
     </Grid>
 </Window>
