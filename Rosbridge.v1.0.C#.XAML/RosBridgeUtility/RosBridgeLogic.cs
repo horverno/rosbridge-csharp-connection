@@ -140,8 +140,9 @@ namespace RosBridgeUtility
         public void sendPublish(String topic, String msg)
         {
             PublishMessage pub1 = new PublishMessage(topic);
-            JObject jsondata = JObject.Parse(JsonConvert.SerializeObject(pub1));
+            JObject jsondata = JObject.Parse(JsonConvert.SerializeObject(pub1));            
             jsondata["msg"] = msg;
+            Console.Out.WriteLine(jsondata.ToString());
             ws.Send(jsondata.ToString());
         }
 
@@ -183,7 +184,7 @@ namespace RosBridgeUtility
                 JObject firstElement = JObject.Parse(item.Item2);
                 resp.Add((T)converter.ConvertFromString(null, 
                     CultureInfo.CreateSpecificCulture("en-US"), 
-                    (firstElement[field]).ToString()));                
+                    (firstElement.SelectToken(field)).ToString()));                
             }
             return resp;
         }
@@ -195,21 +196,99 @@ namespace RosBridgeUtility
             bool test;
             int testInt;
             double testDouble;
-            if (Boolean.TryParse((firstElement[field]).ToString(),out test))
+            if (Boolean.TryParse((firstElement.SelectToken(field)).ToString(), out test))
             {
-                return projectionResponse<Boolean>(topic,field);
+                return projectionResponse<Boolean>(topic, field);
             }
-            else if (Int32.TryParse((firstElement[field]).ToString(), out testInt))
+            else if (Int32.TryParse((firstElement.SelectToken(field)).ToString(), out testInt))
             {
-                return projectionResponse<Int32>(topic,field);
+                return projectionResponse<Int32>(topic, field);
             }
-            else if (Double.TryParse((firstElement[field]).ToString(),
+            else if (Double.TryParse((firstElement.SelectToken(field)).ToString(),
                 NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"),
                 out testDouble))
             {
-                return projectionResponse<Double>(topic,field);
+                return projectionResponse<Double>(topic, field);
             }
-            return null;
+            else if (firstElement.SelectToken(field) is JArray)
+            {
+                Console.WriteLine("Ez egy lista");
+                return null;
+            }
+            else
+            {
+                return projectionResponse<String>(topic, field);
+            } 
+        }
+
+        public void PublishMessage(String topic, String [] keys, Object[] vals)
+        {
+            JObject msgData = new JObject();
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (vals[i] is double)
+                {
+                    msgData[keys[i]] = (Double)vals[i];
+                }
+                else if (vals[i] is Int64)
+                {
+                    msgData[keys[i]] = (Int64)vals[i];
+                }
+                else if (vals[i] is IDictionary<String, Double>)
+                {
+                    msgData[keys[i]] = JObject.Parse(JsonConvert.SerializeObject(vals[i]));
+                }
+                else if (vals[i] is Array)
+                {
+                    JArray arr = new JArray(vals[i]);
+                    msgData[keys[i]] = arr;
+                }
+                else
+                {
+                    bool test;
+                    int testInt;
+                    double testDouble;
+                    if (Boolean.TryParse((vals[i]).ToString(), out test))
+                    {
+                        msgData[keys[i]] = test;
+                    }
+                    else if (Double.TryParse((vals[i]).ToString(),
+                    NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"),
+                    out testDouble))
+                    {
+                        msgData[keys[i]] = testDouble;
+                    }
+                    else if (Int32.TryParse((vals[i]).ToString(), out testInt))
+                    {
+                        msgData[keys[i]] = testInt;
+                    }
+                    else
+                    {
+                        msgData[keys[i]] = vals[i].ToString();
+                    }
+                }
+            }
+            Console.Out.WriteLine(msgData.ToString());
+            sendPublish(topic, msgData);
+        }
+
+        public void PublishTwistMsg(String topic, Object[] linear, Object[] angular)
+        {
+            String[] keys = { "linear", "angular" };
+            Dictionary<String, double> lin = new Dictionary<string, double>()
+            {
+                {"x",(Double)linear[0]},
+                {"y",(Double)linear[1]},
+                {"z",(Double)linear[2]}
+            };
+            Dictionary<String, double> ang = new Dictionary<string, double>()
+            {
+                {"x",(Double)angular[0]},
+                {"y",(Double)angular[1]},
+                {"z",(Double)angular[2]}
+            };
+            Object[] vals = { lin, ang };
+            PublishMessage(topic, keys, vals);
         }
     }
 }

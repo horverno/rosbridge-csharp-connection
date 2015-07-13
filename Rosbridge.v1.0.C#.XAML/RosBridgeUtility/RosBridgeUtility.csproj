@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IROSBridgeController.cs" />
+    <Compile Include="RosBridgeConfig.cs" />
     <Compile Include="RosBridgeLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
