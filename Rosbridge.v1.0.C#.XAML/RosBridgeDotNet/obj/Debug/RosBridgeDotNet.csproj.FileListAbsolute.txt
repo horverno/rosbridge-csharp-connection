@@ -19,10 +19,3 @@ E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\Newtonsoft.J
 E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
 E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
 E:\RosBridgeCsharp\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.dll
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\RosBridgeDotNet.pdb
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.dll
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\bin\Debug\Newtonsoft.Json.xml
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.csprojResolveAssemblyReference.cache
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.dll
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeDotNet\obj\Debug\RosBridgeDotNet.pdb

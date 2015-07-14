@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
       <head>
 	<title>Turtlesim</title>
@@ -11,7 +11,7 @@
       		function main() {
 			var historycounter = 0; /*segédváltozó a history blockban a sorszámok kiírásához*/
       			//var connection = new ros.Connection("ws://localhost:9090"); /*alapesetben ha egyazon gépről csatlakozunk websocketen keresztül, ahol a ROS fut*/
-			var connection = new ros.Connection("ws://10.2.230.124:9090"); /*konkrét IP-vel, ha pl. VirtualBoxban fut a ROS, és a host-ról akarunk csatlakozni ( virtualbox host only adapter kell hozzá, illetve a virtuális gépnek host-only módban kell kapcsolódni a hálózatra )*/
+			var connection = new ros.Connection("ws://192.168.56.101:9090"); /*konkrét IP-vel, ha pl. VirtualBoxban fut a ROS, és a host-ról akarunk csatlakozni ( virtualbox host only adapter kell hozzá, illetve a virtuális gépnek host-only módban kell kapcsolódni a hálózatra )*/
 			var canvas = document.getElementById("turtlecanvas_content"); //canvas elem elfogása
 			var context = canvas.getContext("2d"); //canvason belüli referencia a contextre
       			connection.setOnClose(function (e) {

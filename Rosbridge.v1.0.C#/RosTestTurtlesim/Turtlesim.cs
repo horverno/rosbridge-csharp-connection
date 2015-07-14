@@ -10,7 +10,7 @@ namespace RosTestTurtlesim
     {
         static void Main(string[] args)
         {
-            RosBridgeDotNet.RosBridgeDotNet turtleConnection = new RosBridgeDotNet.RosBridgeDotNet("10.2.230.124");
+            RosBridgeDotNet.RosBridgeDotNet turtleConnection = new RosBridgeDotNet.RosBridgeDotNet("10.2.94.144");
             string topic = "/turtle1/command_velocity";
             string msgtype = "turtlesim/Velocity";
 

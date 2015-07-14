@@ -189,6 +189,26 @@ namespace RosBridgeUtility
             return resp;
         }
 
+        public List<List<T>> projectionResponseList<T>(String topic, String field)
+        {
+            List<List<T>> resp = new List<List<T>>();
+            var converter = TypeDescriptor.GetConverter(typeof(T));
+            foreach (var item in CollectedData.Where(
+                s => s.Item1.Equals("\"" + topic + "\"")))
+            {
+                JArray firstElement = (JArray)JObject.Parse(item.Item2).SelectToken(field);
+                List<T> resp1 = new List<T>();
+                foreach (var item2 in firstElement.ToList())
+                {
+                    resp1.Add((T)converter.ConvertFromString(null,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        item2.ToString()));
+                }
+                resp.Add(resp1);
+            }            
+            return resp;
+        }
+
         public System.Collections.IList getResponseAttribute(String topic, String field)
         {
             JObject firstElement = JObject.Parse(
@@ -212,8 +232,8 @@ namespace RosBridgeUtility
             }
             else if (firstElement.SelectToken(field) is JArray)
             {
-                Console.WriteLine("Ez egy lista");
-                return null;
+                return projectionResponseList<Double>(topic, field);
+                
             }
             else
             {

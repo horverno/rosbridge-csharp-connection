@@ -1,13 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RosBridgeDotNet", "RosBridgeDotNet\RosBridgeDotNet.csproj", "{C0820396-5110-46DA-91ED-713126C01C84}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleTest", "TurtleTest\TurtleTest.csproj", "{7AF1F6C6-7D63-4A0A-862E-40CB4944BBE5}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NeobotixTest", "NeobotixTest\NeobotixTest.csproj", "{AAC4DEF9-8AD2-4587-90E5-9028F5F56ED3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApplicationConnect", "TestApplicationConnect\TestApplicationConnect.csproj", "{98D566FA-862E-41B2-9D10-77A146712D02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RosBridgeUtility", "RosBridgeUtility\RosBridgeUtility.csproj", "{9C773744-39C9-4C2F-9DCF-06B469B89555}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBridgeUtility", "TestBridgeUtility\TestBridgeUtility.csproj", "{5F6C94F9-F187-4D01-9F36-7E12F0238200}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +31,18 @@ Global
 		{AAC4DEF9-8AD2-4587-90E5-9028F5F56ED3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAC4DEF9-8AD2-4587-90E5-9028F5F56ED3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAC4DEF9-8AD2-4587-90E5-9028F5F56ED3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98D566FA-862E-41B2-9D10-77A146712D02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98D566FA-862E-41B2-9D10-77A146712D02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98D566FA-862E-41B2-9D10-77A146712D02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98D566FA-862E-41B2-9D10-77A146712D02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C773744-39C9-4C2F-9DCF-06B469B89555}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C773744-39C9-4C2F-9DCF-06B469B89555}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C773744-39C9-4C2F-9DCF-06B469B89555}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C773744-39C9-4C2F-9DCF-06B469B89555}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F6C94F9-F187-4D01-9F36-7E12F0238200}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F6C94F9-F187-4D01-9F36-7E12F0238200}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F6C94F9-F187-4D01-9F36-7E12F0238200}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F6C94F9-F187-4D01-9F36-7E12F0238200}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
