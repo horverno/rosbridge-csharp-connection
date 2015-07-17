@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rosbridge_config>
+  <network ipaddress="10.2.94.154" port="9090"/>
+  <subcriptions>
+    <topic name="/turtle1/pose"/>
+  </subcriptions>
+  <projections>
+    <query topic="/turtle1/pose" attribute="x"/>
+    <query topic="/turtle1/pose" attribute="y"/>
+    <query topic="/turtle1/pose" attribute="theta"/>
+  </projections>
+</rosbridge_config>

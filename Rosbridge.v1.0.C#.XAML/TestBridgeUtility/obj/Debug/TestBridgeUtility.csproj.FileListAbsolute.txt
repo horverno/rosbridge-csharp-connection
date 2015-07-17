@@ -1,4 +1,5 @@
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Debug\TestBridgeUtility.exe.config
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Debug\TestBridgeUtility.csprojResolveAssemblyReference.cache
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Debug\TestBridgeUtility.exe
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Debug\TestBridgeUtility.pdb
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Debug\RosBridgeUtility.dll
@@ -8,6 +9,5 @@ E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtili
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Debug\Newtonsoft.Json.pdb
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Debug\Newtonsoft.Json.xml
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Debug\websocket-sharp.xml
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Debug\TestBridgeUtility.csprojResolveAssemblyReference.cache
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Debug\TestBridgeUtility.exe
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Debug\TestBridgeUtility.pdb

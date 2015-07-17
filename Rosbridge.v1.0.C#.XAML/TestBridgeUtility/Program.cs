@@ -9,13 +9,19 @@ namespace TestBridgeUtility
 {
     class Program
     {
-
         static void Main(string[] args)
         {
+            RosBridgeUtility.RosBridgeConfig conf1 = new RosBridgeUtility.RosBridgeConfig();
+            conf1.readConfig("XMLFile1.xml");
             RosBridgeUtility.RosBridgeLogic logic = new RosBridgeUtility.RosBridgeLogic();
-            logic.Initialize("ws://10.2.94.154:9090");
+            logic.AddStoppedListener(logic_MonitoringStopped);
+            logic.Initialize(conf1.URI);
             logic.Connect();
-            logic.initializeCollection();            
+            logic.initializeCollection();
+            foreach (var item in conf1.getTopicList())
+            {
+                Console.Out.WriteLine(item.name);
+            }
             /*
             Dictionary<String, double> lin = new Dictionary<string, double>()
             {
@@ -36,35 +42,28 @@ namespace TestBridgeUtility
             //logic.PublishMessage("/turtle1/cmd_vel", keys, vals);
             Object[] lin = {2.0, 0.0, 0.0};
             Object[] ang = {0.0, 0.0, 3.14};
-            logic.PublishTwistMsg("/turtle1/cmd_vel", lin, ang);
-
-            logic.StartCollection("/turtle1/pose");
-            logic.StartCollection("/turtle1/color_sensor");
-            //logic.StartCollection("/turtle1/cmd_vel");
-            logic.StartCollection("/base_scan");
+            foreach (var item in conf1.getPublicationList())
+            {
+                logic.PublishTwistMsg(item, lin, ang);                
+            }
+            logic.StartCollections(conf1.getTopicList());
             System.Threading.Thread.Sleep(2500);
-            logic.RemoveCollection("/turtle1/pose");
-            logic.RemoveCollection("/turtle1/color_sensor");
-            //logic.RemoveCollection("/turtle1/cmd_vel");
-            logic.RemoveCollection("/base_scan");
+
+            logic.RemoveCollections(conf1.getTopicList());
             var x = logic.StopCollection();
-            
-            foreach (var item in logic.getResponseAttribute("/turtle1/pose","theta"))
+            foreach (var attr in conf1.ProjectedAttributes())
             {
-                Console.Out.WriteLine(item.ToString());
-            }
-            
-            /*
-            foreach (var item in logic.getResponseAttribute("/turtle1/cmd_vel","linear.y.y"))
-            {
-                Console.Out.WriteLine(item.ToString());
-            }
-             * */
-            foreach (var item in logic.getResponseAttribute("/base_scan", "intensities"))
-            {
-                Console.Out.WriteLine(item.ToString());
-            }
-            
+                //Console.Out.WriteLine(attr.Item2);
+                foreach (var item in logic.getResponseAttribute(attr.Item1, attr.Item2))
+                {
+                    Console.Out.WriteLine(item.ToString());
+                }
+            }            
+        }
+
+        static void logic_MonitoringStopped(Object Sender, EventArgs e)
+        {
+            Console.Out.WriteLine("Monitoring stopped here");
         }
     }
 }

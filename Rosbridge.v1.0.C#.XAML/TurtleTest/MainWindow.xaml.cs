@@ -28,6 +28,7 @@ namespace TurtleTest
     public partial class MainWindow : Window, RosBridgeUtility.IROSBridgeController
     {
         RosBridgeUtility.RosBridgeLogic bridgeLogic;
+        RosBridgeUtility.RosBridgeConfig bridgeConfig;
 
 
         private RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse _responseObj = new RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse();
@@ -53,6 +54,8 @@ namespace TurtleTest
             this.connectionState = (int)ConnectionState.Disconnected;
             this.subscriptionState = (int)SubscriptionState.Unsubscribed;
             bridgeLogic.setSubject(this);
+            this.bridgeConfig = new RosBridgeUtility.RosBridgeConfig();
+            bridgeConfig.readConfig("XMLFile1.xml");
         }
         
 
@@ -85,9 +88,13 @@ namespace TurtleTest
             {
                 try
                 {
-                    bridgeLogic.sendSubscription("/turtle1/pose");
+                    foreach (var item in bridgeConfig.getTopicList())
+                    {
+                        bridgeLogic.sendSubscription(item.name,item.throttle);
+                    }
                     subscriptionState = (int)SubscriptionState.Subscribed;
                     btnSubscribe.Content = "Unsubscribe";
+                    bridgeLogic.SetUpdateListener();
                 }
                 catch (Exception se)
                 {
@@ -98,7 +105,11 @@ namespace TurtleTest
             {
                 try
                 {
-                    bridgeLogic.sendUnsubscribe("/turtle1/pose");
+                    foreach (var item in bridgeConfig.getTopicList())
+                    {
+                        bridgeLogic.sendUnsubscribe(item.name);
+                    }
+                    //bridgeLogic.sendUnsubscribe("/turtle1/pose");
                     subscriptionState = (int)SubscriptionState.Unsubscribed;
                     btnSubscribe.Content = "Subscribe";
                 }
@@ -154,7 +165,8 @@ namespace TurtleTest
             
             try
             {
-                bridgeLogic.Initialize("ws://" + txtIP.Text + ":" + txtPort.Text, this);
+                //bridgeLogic.Initialize("ws://" + txtIP.Text + ":" + txtPort.Text, this);
+                bridgeLogic.Initialize(bridgeConfig.URI);
                 bridgeLogic.Connect();
                 return true;
             }
@@ -174,8 +186,13 @@ namespace TurtleTest
             try
             {
                 var v = new { linear = linear, angular = angular };
-                bridgeLogic.sendPublish("/turtle1/command_velocity", 
-                    JObject.Parse(JsonConvert.SerializeObject(v)));
+                Object[] lin = { linear, 0.0, 0.0 };
+                Object[] ang = { 0.0, 0.0, angular };
+                foreach (var item in bridgeConfig.getPublicationList())
+                {
+                    bridgeLogic.PublishTwistMsg(item, lin, ang);
+                }
+                
             }
             catch (SocketException se)
             {
@@ -188,10 +205,11 @@ namespace TurtleTest
         public void ReceiveUpdate(String data)
         {
             JObject jsonData = JObject.Parse(data);
-            Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + jsonData["msg"]["x"]));
-            Dispatcher.Invoke(new Action(() => labelY.Content = "y: " + jsonData["msg"]["y"]));
-            Dispatcher.Invoke(new Action(() => labelTheta.Content = "t: " + jsonData["msg"]["theta"] +
-                " (Deg: " + Math.Round((float)jsonData["msg"]["theta"] * 180 / Math.PI, 4).ToString() + ")"));
+            Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2]));
+            Dispatcher.Invoke(new Action(() => labelY.Content = "y: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[1].Item2]));
+            Dispatcher.Invoke(new Action(() => labelTheta.Content = "t: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[2].Item2] +
+                " (Deg: " + Math.Round((float)jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2] 
+                * 180 / Math.PI, 4).ToString() + ")"));
         }
         
 

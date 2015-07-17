@@ -33,18 +33,22 @@ namespace RosBridgeUtility
 
     class SubscribeMessage : UnsubscribeMessage
     {
+        public int throttle_rate { get; set; }
+
         public SubscribeMessage()
         {
             op = "subscribe";
+            throttle_rate = 0;
         }
-        public SubscribeMessage(String _topic)
+        public SubscribeMessage(String _topic, int throttle = 0)
         {
             op = "subscribe";
             topic = _topic;
+            throttle_rate = throttle;
         }
     }
 
-    class PublishMessage : SubscribeMessage
+    class PublishMessage : UnsubscribeMessage
     {
         public PublishMessage(String _topic)
             : base(_topic)
@@ -63,9 +67,33 @@ namespace RosBridgeUtility
         IROSBridgeController subject;
         List<Tuple<String, String>> CollectedData;
 
+        public delegate void MonitoringStoppedHandler(object sender, EventArgs e);
+        public event EventHandler MonitoringStopped;
+        public void OnMonitoringStopped()
+        {
+            if (MonitoringStopped != null)
+            {
+                MonitoringStopped(this, EventArgs.Empty);
+            }
+            else
+            {
+                Console.Out.WriteLine("Monitoring stopped");
+            }
+        }
+
+        public void SetUpdateListener()
+        {
+            ws.OnMessage += UpdateOnReceive;
+        }
+
+        public void AddStoppedListener(EventHandler mon1)
+        {
+            MonitoringStopped += mon1;
+        }
+
         public void Initialize(String ipaddress)
         {
-            ws = new WebSocket(ipaddress);            
+            ws = new WebSocket(ipaddress);         
         }
 
         public void Initialize(String ipaddress, IROSBridgeController parentwindow)
@@ -96,6 +124,7 @@ namespace RosBridgeUtility
             JObject jData = JObject.Parse(a.Data);
             CollectedData.Add(new Tuple<String, String>(jData["topic"].ToString(),
                 jData["msg"].ToString()));
+
         }
 
         public void initializeCollection()
@@ -104,26 +133,27 @@ namespace RosBridgeUtility
             ws.OnMessage += CollectData;
         }
 
-        public void StartCollection(String topic)
+        public void StartCollection(String topic, int throttle=0)
         {
-            sendSubscription(topic);
+            sendSubscription(topic, throttle);
         }
 
         public void RemoveCollection(String topic)
         {
-            sendUnsubscribe(topic);            
+            sendUnsubscribe(topic);       
         }
 
         public List<Tuple<String, String>> StopCollection()
         {
+            OnMonitoringStopped();
             ws.OnMessage -= CollectData;
             return CollectedData;
         }
 
-        public void sendSubscription(String topic)
+        public void sendSubscription(String topic, int throttle = 0)
         {
-            SubscribeMessage sub1 = new SubscribeMessage(topic);
-            ws.Send(JsonConvert.SerializeObject(sub1).ToString());            
+            SubscribeMessage sub1 = new SubscribeMessage(topic, throttle);
+            ws.Send(JsonConvert.SerializeObject(sub1).ToString());
         }
 
         public void sendUnsubscribe(String topic)
@@ -241,6 +271,22 @@ namespace RosBridgeUtility
             } 
         }
 
+        public void StartCollections(IList<TopicObject> subscriptions)
+        {
+            foreach (var item in subscriptions)
+            {
+                this.StartCollection(item.name, item.throttle);
+            }
+        }
+
+        public void RemoveCollections(IList<TopicObject> subscriptions)
+        {
+            foreach (var item in subscriptions)
+            {
+                this.RemoveCollection(item.name);
+            }
+        }
+
         public void PublishMessage(String topic, String [] keys, Object[] vals)
         {
             JObject msgData = new JObject();
@@ -309,6 +355,6 @@ namespace RosBridgeUtility
             };
             Object[] vals = { lin, ang };
             PublishMessage(topic, keys, vals);
-        }
+        }        
     }
 }

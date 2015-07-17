@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rosbridge_config>
+  <network ipaddress="10.2.94.154" port="9090" protocol="ws"/>
+  <subscriptions>
+    <topic name="/base_scan" throttle="200"/>
+    <topic name="/turtle1/pose"/>
+  </subscriptions>
+  <publications>
+    <topic name="/turtle1/cmd_vel"/>
+  </publications>
+  <projections>
+    <query topic="/base_scan" attribute="ranges"/>
+    <query topic="/turtle1/pose" attribute="x.x"/>
+    <query topic="/turtle1/pose" attribute="theta"/>
+  </projections>
+</rosbridge_config>
