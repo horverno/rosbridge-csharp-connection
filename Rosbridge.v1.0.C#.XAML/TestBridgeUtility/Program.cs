@@ -17,11 +17,7 @@ namespace TestBridgeUtility
             logic.AddStoppedListener(logic_MonitoringStopped);
             logic.Initialize(conf1.URI);
             logic.Connect();
-            logic.initializeCollection();
-            foreach (var item in conf1.getTopicList())
-            {
-                Console.Out.WriteLine(item.name);
-            }
+            logic.InitializeCollection();
             /*
             Dictionary<String, double> lin = new Dictionary<string, double>()
             {
@@ -36,29 +32,35 @@ namespace TestBridgeUtility
                 {"z",3.14},
             };
             Object[] vals = { lin, ang };
-             * */
-
+            */
             //logic.PublishMessage("/turtle1/command_velocity", keys, vals);
             //logic.PublishMessage("/turtle1/cmd_vel", keys, vals);
-            Object[] lin = {2.0, 0.0, 0.0};
-            Object[] ang = {0.0, 0.0, 3.14};
+            Object[] lin = { 2.0, 0.0, 0.0 };
+            Object[] ang = { 0.0, 0.0, 3.14 };
             foreach (var item in conf1.getPublicationList())
             {
-                logic.PublishTwistMsg(item, lin, ang);                
+                logic.PublishTwistMsg(item, lin, ang);
             }
             logic.StartCollections(conf1.getTopicList());
-            System.Threading.Thread.Sleep(2500);
+            Object[] linNeo = { 2.1, 2.1 };
+            Object[] driveActive = { true, true };
+            Object[] quickStop = { false, false };
+            Object[] disableBrake = { true, true };
+            logic.PublishNeobotixCommandMsg("/DriveCommands", linNeo, driveActive, quickStop, disableBrake);
+            System.Threading.Thread.Sleep(1000);
 
             logic.RemoveCollections(conf1.getTopicList());
             var x = logic.StopCollection();
             foreach (var attr in conf1.ProjectedAttributes())
             {
-                //Console.Out.WriteLine(attr.Item2);
+                Console.Out.WriteLine(attr.Item2);
                 foreach (var item in logic.getResponseAttribute(attr.Item1, attr.Item2))
                 {
-                    Console.Out.WriteLine(item.ToString());
+                    Console.Out.WriteLine(((List<Double>)item)[0]);
+                    //Console.Out.WriteLine("{0}: {1} {2}", attr.Item1, ((List<Double>)item)[0], ((List<Double>)item)[1]);
                 }
-            }            
+            }
+            
         }
 
         static void logic_MonitoringStopped(Object Sender, EventArgs e)

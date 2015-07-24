@@ -9,3 +9,14 @@ E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtilit
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\obj\Debug\RosBridgeUtility.csprojResolveAssemblyReference.cache
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\obj\Debug\RosBridgeUtility.dll
 E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\obj\Debug\RosBridgeUtility.pdb
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\bin\Debug\RosBridgeUtility.dll.config
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\bin\Debug\RosBridgeUtility.dll
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\bin\Debug\RosBridgeUtility.pdb
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\bin\Debug\Newtonsoft.Json.dll
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\bin\Debug\websocket-sharp.dll
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\bin\Debug\Newtonsoft.Json.pdb
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\bin\Debug\Newtonsoft.Json.xml
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\bin\Debug\websocket-sharp.xml
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\obj\Debug\RosBridgeUtility.csprojResolveAssemblyReference.cache
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\obj\Debug\RosBridgeUtility.dll
+c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\RosBridgeUtility\obj\Debug\RosBridgeUtility.pdb

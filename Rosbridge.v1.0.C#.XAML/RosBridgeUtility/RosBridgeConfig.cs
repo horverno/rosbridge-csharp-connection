@@ -19,11 +19,16 @@ namespace RosBridgeUtility
     public class RosBridgeConfig
     {
         public String URI { get; set; }
+        public String ipaddress { get; set; }
+        public int port { get; set; }
+        public String protocol { get; set; }
+        public String target { get; set; }
+
         private List<TopicObject> monitoredTopics;
         private List<Tuple<String, String>> projectedAttributes;
         private List<String> publications;
         private XmlDocument doc;
-
+        
         public RosBridgeConfig()
         {
             monitoredTopics = new List<TopicObject>();
@@ -36,9 +41,9 @@ namespace RosBridgeUtility
         {
             doc.Load(path);
             XmlNode node = doc.DocumentElement.SelectSingleNode("/rosbridge_config/network");
-            String ipaddress = node.Attributes["ipaddress"].Value;
-            int port = Int32.Parse(node.Attributes["port"].Value);
-            String protocol = node.Attributes["protocol"].Value;
+            ipaddress = node.Attributes["ipaddress"].Value;
+            port = Int32.Parse(node.Attributes["port"].Value);
+            protocol = node.Attributes["protocol"].Value;
             URI = protocol + "://" + ipaddress + ":" + port.ToString();
             Console.Out.WriteLine(URI);
             foreach (var item in 
@@ -68,6 +73,15 @@ namespace RosBridgeUtility
                     ("/rosbridge_config/publications").ChildNodes)
                 {
                     publications.Add(((XmlNode)item).Attributes["name"].Value);
+                    try
+                    {
+                        target = ((XmlNode)item).Attributes["target"].Value;
+                        Console.WriteLine("New target: {0}", target);
+                    }
+                    catch (NullReferenceException e1)
+                    {
+                        Console.WriteLine("{0}: no target specified, ignoring", e1.Data);
+                    }
                 }
             }
             catch (NullReferenceException e)

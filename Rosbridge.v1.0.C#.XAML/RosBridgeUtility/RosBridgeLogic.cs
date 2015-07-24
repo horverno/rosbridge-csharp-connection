@@ -66,6 +66,7 @@ namespace RosBridgeUtility
         JObject lastMessage;
         IROSBridgeController subject;
         List<Tuple<String, String>> CollectedData;
+        Boolean connected;
 
         public delegate void MonitoringStoppedHandler(object sender, EventArgs e);
         public event EventHandler MonitoringStopped;
@@ -79,6 +80,11 @@ namespace RosBridgeUtility
             {
                 Console.Out.WriteLine("Monitoring stopped");
             }
+        }
+
+        public bool isConnected()
+        {
+            return connected;
         }
 
         public void SetUpdateListener()
@@ -102,12 +108,13 @@ namespace RosBridgeUtility
             subject = parentwindow;
             ws.OnMessage += UpdateOnReceive;
             Console.Out.WriteLine("Initialized RosBridgeLogic component");
-            
+            connected = false;
         }
 
         public void Connect()
         {
             ws.Connect();
+            connected = true;
             Console.Out.WriteLine("Successfully connected to: {0}", ws.Url);
         }
 
@@ -116,6 +123,7 @@ namespace RosBridgeUtility
             if (ws.ReadyState == WebSocketState.Open)
             {
                 ws.Close();
+                connected = false;
             }
         }
 
@@ -127,7 +135,7 @@ namespace RosBridgeUtility
 
         }
 
-        public void initializeCollection()
+        public void InitializeCollection()
         {
             CollectedData = new List<Tuple<string,string>>();
             ws.OnMessage += CollectData;
@@ -241,34 +249,45 @@ namespace RosBridgeUtility
 
         public System.Collections.IList getResponseAttribute(String topic, String field)
         {
-            JObject firstElement = JObject.Parse(
-                CollectedData.First(s => s.Item1.Equals("\""+topic+"\"") ).Item2);
-            bool test;
-            int testInt;
-            double testDouble;
-            if (Boolean.TryParse((firstElement.SelectToken(field)).ToString(), out test))
+            try
             {
-                return projectionResponse<Boolean>(topic, field);
+                JObject firstElement = JObject.Parse(
+                    CollectedData.First(s => s.Item1.Equals("\"" + topic + "\"")).Item2);
+                bool test;
+                int testInt;
+                double testDouble;
+                if (Boolean.TryParse((firstElement.SelectToken(field)).ToString(), out test))
+                {
+                    return projectionResponse<Boolean>(topic, field);
+                }
+                else if (Int32.TryParse((firstElement.SelectToken(field)).ToString(), out testInt))
+                {
+                    return projectionResponse<Int32>(topic, field);
+                }
+                else if (Double.TryParse((firstElement.SelectToken(field)).ToString(),
+                    NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"),
+                    out testDouble))
+                {
+                    return projectionResponse<Double>(topic, field);
+                }
+                else if (firstElement.SelectToken(field) is JArray)
+                {
+                    return projectionResponseList<Double>(topic, field);
+
+                }
+                else
+                {
+                    return projectionResponse<String>(topic, field);
+                }
             }
-            else if (Int32.TryParse((firstElement.SelectToken(field)).ToString(), out testInt))
+            catch (Exception se)
             {
-                return projectionResponse<Int32>(topic, field);
+                /*
+                Console.WriteLine(se.Data);
+                return new List<Double>() {0};
+                 * */
+                throw se;
             }
-            else if (Double.TryParse((firstElement.SelectToken(field)).ToString(),
-                NumberStyles.Number, CultureInfo.CreateSpecificCulture("en-US"),
-                out testDouble))
-            {
-                return projectionResponse<Double>(topic, field);
-            }
-            else if (firstElement.SelectToken(field) is JArray)
-            {
-                return projectionResponseList<Double>(topic, field);
-                
-            }
-            else
-            {
-                return projectionResponse<String>(topic, field);
-            } 
         }
 
         public void StartCollections(IList<TopicObject> subscriptions)
@@ -355,6 +374,85 @@ namespace RosBridgeUtility
             };
             Object[] vals = { lin, ang };
             PublishMessage(topic, keys, vals);
-        }        
+        }
+
+        public void PublishNeobotixCommandMsg(String topic, Object[] angularVelocity,
+            Object[] driveActive, Object[] quickStop, Object[] disableBrake)
+        {
+            String[] keys = { "angularVelocity", "driveActive", 
+                                "quickStop", "disableBrake" };
+            Object[] vals = { angularVelocity, 
+                                driveActive, quickStop, disableBrake };
+            PublishMessage(topic, keys, vals);
+        }
+
+        public void moveTarget(double linear, double angular, String target, IList<String> publicationList)
+        {
+            switch (target)
+            {
+                case "turtle":
+                    PublishturtleMessage(linear, angular, publicationList);
+                    break;
+                case "neobotix_mp500":
+                    PublishNeobotixMsg(linear, angular, publicationList);
+                    break;
+                default:
+                    throw new Exception("Invalid target");
+            }
+        }
+
+        private void PublishNeobotixMsg(double linear, double angular, IList<String> publicationList)
+        {
+            try
+            {
+                double r = 0.1275;
+                double b = 0.56;
+                Object[] linNeo = { linear/r+(angular*b/r), linear/r-(angular*b/r)};
+                Object[] driveActive = { true, true };
+                Object[] quickStop = { false, false };
+                Object[] disableBrake = { true, true };
+                /*
+                foreach (var item in bridgeConfig.getPublicationList())
+                {
+                    this.PublishTwistMsg(item, lin, ang);
+                }
+                 * */
+                foreach (var item in publicationList)
+                {
+                    this.PublishNeobotixCommandMsg(item, linNeo, 
+                        driveActive, quickStop, disableBrake);
+                }
+
+            }
+            catch (System.Net.Sockets.SocketException)
+            {
+                throw new System.Net.Sockets.SocketException(10);
+            }
+        }
+
+        public void PublishturtleMessage(double linear, double angular, IList<String> publicationList)
+        {
+            try
+            {
+                var v = new { linear = linear, angular = angular };
+                Object[] lin = { linear, 0.0, 0.0 };
+                Object[] ang = { 0.0, 0.0, angular };
+                /*
+                foreach (var item in bridgeConfig.getPublicationList())
+                {
+                    this.PublishTwistMsg(item, lin, ang);
+                }
+                 * */
+                foreach (var item in publicationList)
+                {
+                    this.PublishTwistMsg(item, lin, ang);
+                }
+
+            }
+            catch (System.Net.Sockets.SocketException)
+            {
+                throw new System.Net.Sockets.SocketException(10);
+            }
+        }
     }
 }

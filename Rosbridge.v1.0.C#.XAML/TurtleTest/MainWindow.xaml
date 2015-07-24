@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TurtleTest.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Rosbridge turtle test" MinHeight="480" Height="480" Width="600">
+        Title="Rosbridge turtle test" MinHeight="480" Height="480" Width="600" KeyDown="Window_KeyDown_1">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
@@ -13,10 +13,12 @@
             <Button x:Name="btnConnect" Click="btnConnect_Click" Content="Connect" Background="OrangeRed" Margin="2"/>
             <StackPanel x:Name="stackControls" Margin="8">
                 <Button x:Name="btnSubscribe" Click="btnSubscribe_Click" Content="Subcribe" Margin="2"/>
+                <Label Content="Target is idle" x:Name="lblTargetState"/>
                 <Button x:Name="btnForward" Click="btnForward_Click" Content="Forward" Margin="2"/>
                 <Button x:Name="btnBackward" Click="btnBackward_Click" Content="Backward" Margin="2"/>
                 <Button x:Name="btnLeft" Click="btnLeft_Click" Content="Left" Margin="2"/>
                 <Button x:Name="btnRight" Click="btnRight_Click" Content="Right" Margin="2"/>
+                <Button x:Name="btnStop" Click="btnStop_Click" Content="Stop" Margin="2"/>
                 <Label Content="Length of velocity vector"/>
                 <TextBox x:Name="txtLgth" Text="1" Margin="2"/>
                 <Label Content="Degree of rotation" Margin="2"/>
@@ -27,8 +29,10 @@
                 <Label x:Name="labelTheta"  Content="{Binding receiver}" />
             </StackPanel>
         </StackPanel>
-        <Rectangle x:Name="color_sensor_feedback" Grid.Column="1">
-            
-        </Rectangle>
+        <StackPanel Grid.Column="1">
+            <Label Content="Laser scanner read ranges"/>
+            <Canvas x:Name="sensor_projection" Margin="2 2 2 2">
+            </Canvas>
+        </StackPanel>
     </Grid>
 </Window>

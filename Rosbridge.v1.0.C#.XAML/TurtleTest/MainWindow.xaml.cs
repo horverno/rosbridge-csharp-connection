@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -56,6 +57,9 @@ namespace TurtleTest
             bridgeLogic.setSubject(this);
             this.bridgeConfig = new RosBridgeUtility.RosBridgeConfig();
             bridgeConfig.readConfig("XMLFile1.xml");
+            Console.WriteLine("Ipaddress: {0}",bridgeConfig.ipaddress);
+            txtIP.Text = bridgeConfig.ipaddress;
+            txtPort.Text = bridgeConfig.port.ToString();
         }
         
 
@@ -126,25 +130,51 @@ namespace TurtleTest
             return deg * Math.PI / 180.0;
         }
 
+        private void moveForward()
+        {
+            bridgeLogic.moveTarget(Double.Parse(txtLgth.Text), 0,
+                bridgeConfig.target, bridgeConfig.getPublicationList());
+        }
+
         private void btnForward_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(Double.Parse(txtLgth.Text), 0);
+            moveForward();
+        }
+
+        private void moveBackward()
+        {
+            bridgeLogic.moveTarget(-Double.Parse(txtLgth.Text), 0,
+                bridgeConfig.target, bridgeConfig.getPublicationList());
         }
 
         private void btnBackward_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(-Double.Parse(txtLgth.Text), 0);
+            //PublishturtleMessage(-Double.Parse(txtLgth.Text), 0);
+            moveBackward();
+        }
+
+        private void moveLeft()
+        {
+            bridgeLogic.moveTarget(Double.Parse(txtLgth.Text), convertTextBlocktoRadians(),
+                bridgeConfig.target, bridgeConfig.getPublicationList());
         }
 
         private void btnLeft_Click(object sender, RoutedEventArgs e)
         {
+            //PublishturtleMessage(Double.Parse(txtLgth.Text), convertTextBlocktoRadians());
+            moveLeft();
+        }
 
-            PublishturtleMessage(Double.Parse(txtLgth.Text), convertTextBlocktoRadians());
+        private void moveRight()
+        {
+            bridgeLogic.moveTarget(Double.Parse(txtLgth.Text), -convertTextBlocktoRadians(),
+                bridgeConfig.target, bridgeConfig.getPublicationList());
         }
 
         private void btnRight_Click(object sender, RoutedEventArgs e)
         {
-            PublishturtleMessage(Double.Parse(txtLgth.Text), -convertTextBlocktoRadians());
+            moveRight();
+            //PublishturtleMessage(Double.Parse(txtLgth.Text), -convertTextBlocktoRadians());
             //Update();
         }
         /// <summary>
@@ -165,8 +195,8 @@ namespace TurtleTest
             
             try
             {
-                //bridgeLogic.Initialize("ws://" + txtIP.Text + ":" + txtPort.Text, this);
-                bridgeLogic.Initialize(bridgeConfig.URI);
+                bridgeLogic.Initialize(bridgeConfig.protocol+ "://" + txtIP.Text + ":" + txtPort.Text, this);
+                //bridgeLogic.Initialize(bridgeConfig.URI);
                 bridgeLogic.Connect();
                 return true;
             }
@@ -202,14 +232,126 @@ namespace TurtleTest
 
         public delegate void UpdateTextElements(String data);
 
+        public void laserScanCanvas(List<JToken> data)
+        {
+            sensor_projection.Children.Clear();
+            Polyline plot = new Polyline();
+            plot.Stroke = System.Windows.Media.Brushes.MediumVioletRed;
+            plot.StrokeThickness = 1;
+            PointCollection points = new PointCollection();
+            //var converter = TypeDescriptor.GetConverter(typeof(Double));
+            Double x = 0;
+            foreach (var item in data)
+            {
+                System.Diagnostics.Debug.WriteLine(item);
+                Double yVal;
+                Double.TryParse(item.ToString(), NumberStyles.Number, 
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out yVal);                
+                points.Add(new Point(x,10*yVal));
+                x+= 1;
+            }
+            plot.Points = points;
+            sensor_projection.Children.Add(plot);
+        }
+
         public void ReceiveUpdate(String data)
         {
             JObject jsonData = JObject.Parse(data);
-            Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2]));
-            Dispatcher.Invoke(new Action(() => labelY.Content = "y: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[1].Item2]));
-            Dispatcher.Invoke(new Action(() => labelTheta.Content = "t: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[2].Item2] +
-                " (Deg: " + Math.Round((float)jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2] 
-                * 180 / Math.PI, 4).ToString() + ")"));
+            try
+            {
+                // Debug messages
+                if (jsonData["topic"].ToString().Equals("\"/DriveStates\""))
+                {
+                    var topic_x = Array.ConvertAll(jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2].ToArray(), o => (double)o);
+                    Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + topic_x[0] + ",\t" + topic_x[1]));
+                    var topic_y = Array.ConvertAll(jsonData["msg"][bridgeConfig.ProjectedAttributes()[1].Item2].ToArray(), o => (double)o);
+                    Dispatcher.Invoke(new Action(() => labelY.Content = "y: " +topic_y[0] + ",\t" + topic_y[1]));                    
+                }
+                    /*
+                else if (jsonData["topic"].ToString().Equals("\"/turtle1/pose\""))
+                {
+                    Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2]));
+                    Dispatcher.Invoke(new Action(() => labelY.Content = "y: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[1].Item2]));
+                    Dispatcher.Invoke(new Action(() => labelTheta.Content = "t: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[2].Item2] +
+                        " (Deg: " + Math.Round((float)jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2]
+                        * 180 / Math.PI, 4).ToString() + ")"));
+                }
+                     * */
+                else if (jsonData["topic"].ToString().Replace("\"","").Equals("/sick_s300/scan"))
+                {
+                    /*
+                    var x1 = jsonData["msg"]["ranges"].ToList();
+                    foreach (var itemx in ((IList<JToken>)x1))
+                    {
+                        Console.WriteLine(itemx);
+                    }
+                    */
+                    Dispatcher.Invoke(new Action(() =>
+                        laserScanCanvas(jsonData["msg"]["ranges"].ToList())));
+                    
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                Console.Out.WriteLine("Received null argument on {0}",jsonData["topic"]);
+            }
+        }
+
+        private void moveStopped()
+        {
+            bridgeLogic.moveTarget(0, 0,
+                bridgeConfig.target, bridgeConfig.getPublicationList());
+        }
+
+        private void btnStop_Click(object sender, RoutedEventArgs e)
+        {
+            moveStopped();
+        }
+
+        private void Window_KeyDown_1(object sender, KeyEventArgs e)
+        {
+            double vel;
+                    
+            switch (e.Key)
+            {
+                case Key.W:
+                    lblTargetState.Content = "Target is moving forward";
+                    moveForward();
+                    break;
+                case Key.A:
+                    lblTargetState.Content = "Target is moving left";
+                    moveLeft();
+                    break;
+                case Key.D:
+                    lblTargetState.Content = "Target is moving right";
+                    moveRight();
+                    break;
+                case Key.S:
+                    lblTargetState.Content = "Target is moving backwards";
+                    moveBackward();
+                    break;
+                case Key.X:
+                    lblTargetState.Content = "Target is stopped";
+                    moveStopped();
+                    break;
+                case Key.Add:
+                    Double.TryParse(txtLgth.Text,out vel);
+                    txtLgth.Text = (vel + 0.1).ToString();
+                    break;
+                case Key.Subtract:
+                    Double.TryParse(txtLgth.Text,out vel);
+                    txtLgth.Text = (vel - 0.1).ToString();
+                    break;
+                case Key.K:
+                    Double.TryParse(txtTheta.Text, out vel);
+                    txtTheta.Text = (vel + 15).ToString();
+                    break;
+                case Key.L:
+                    Double.TryParse(txtTheta.Text, out vel);
+                    txtTheta.Text = (vel - 15).ToString();
+                    break;
+            }
         }
         
 
