@@ -4,7 +4,7 @@ The aim of the project is to develop C# applications which connects to ROS via R
 
 
 ## Demo video
-A demo of a C# application which connects to ROS via RosBridge. The communication is a JSON socket communication. 
+A demo of a C# application which connects to ROS via RosBridge. The communication is a JSON socket communication. [Watch the video on YouTube](https://youtu.be/cVuTH-KwDqA).
 
 ## Usage
 ### Rosbridge 1.0
@@ -25,3 +25,10 @@ rosrun turtlesim turtlesim_node
 
 ## Demo image
 ![alt tag](http://www.sze.hu/~herno/robotics/rosbridge-csharp-connection.png)
+
+## Related links
+* [ROS official](http://ros.org/)
+* [Rosbridge wiki](http://wiki.ros.org/rosbridge_suite) 
+* [Rosbridge on GitHub](https://github.com/RobotWebTools/rosbridge_suite)
+* [Newtonsoft.Json](http://www.newtonsoft.com/json)
+* [Newtonsoft.Json on GitHub](https://github.com/JamesNK/Newtonsoft.Json)
