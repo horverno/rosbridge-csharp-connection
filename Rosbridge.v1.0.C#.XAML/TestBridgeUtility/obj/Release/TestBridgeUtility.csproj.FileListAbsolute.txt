@@ -12,3 +12,17 @@ c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XA
 c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\websocket-sharp.xml
 c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Release\TestBridgeUtility.csprojResolveAssemblyReference.cache
 c:\DATA_ARCH\JKK_ROS\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Release\TestBridgeUtility.g.resources
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\TestBridgeUtility.exe.config
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\TestBridgeUtility.exe
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\TestBridgeUtility.pdb
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\RosBridgeUtility.dll
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\Newtonsoft.Json.dll
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\websocket-sharp.dll
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\RosBridgeUtility.pdb
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\Newtonsoft.Json.pdb
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\Newtonsoft.Json.xml
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\bin\Release\websocket-sharp.xml
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Release\TestBridgeUtility.csprojResolveAssemblyReference.cache
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Release\TestBridgeUtility.g.resources
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Release\TestBridgeUtility.exe
+E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TestBridgeUtility\obj\Release\TestBridgeUtility.pdb

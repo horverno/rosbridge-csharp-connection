@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <rosbridge_config>
-  <network ipaddress="192.168.0.151" port="9090" protocol="ws"/>
+  <network ipaddress="192.168.0.152" port="9090" protocol="ws"/>
   <subscriptions>
-    <topic name="/DriveStates"/>
     <topic name="/sick_s300/scan"/>
+    <topic name="/DriveStates"/>
   </subscriptions>
   <publications>
     <topic name="/DriveCommands" target="neobotix_mp500"/>
@@ -11,5 +11,6 @@
   <projections>
     <query topic="/DriveStates" attribute="angularPosition"/>
     <query topic="/DriveStates" attribute="angularVelocity"/>
+    <query topic="/sick_s300/scan" attribute="ranges"/>
   </projections>
 </rosbridge_config>

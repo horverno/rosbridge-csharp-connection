@@ -65,24 +65,31 @@ namespace TurtleTest
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-     
-            if (connectionState==(int)(ConnectionState.Disconnected))
+            try
             {
-                if (ConnectToRos())
+
+                if (connectionState == (int)(ConnectionState.Disconnected))
                 {
-                    connectionState = (int)ConnectionState.Connected;
-                    btnConnect.Background = Brushes.LightGreen;
-                    btnConnect.Content = "Disconnect";
-                    stackControls.Visibility = System.Windows.Visibility.Visible;
+                    if (ConnectToRos())
+                    {
+                        connectionState = (int)ConnectionState.Connected;
+                        btnConnect.Background = Brushes.LightGreen;
+                        btnConnect.Content = "Disconnect";
+                        stackControls.Visibility = System.Windows.Visibility.Visible;
+                    }
+                }
+                else
+                {
+                    DisconnectFromRos();
+                    connectionState = (int)ConnectionState.Disconnected;
+                    btnConnect.Background = Brushes.OrangeRed;
+                    btnConnect.Content = "Connect";
+                    stackControls.Visibility = System.Windows.Visibility.Hidden;
                 }
             }
-            else
+            catch (Exception se)
             {
-                DisconnectFromRos();
-                connectionState = (int)ConnectionState.Disconnected;
-                btnConnect.Background = Brushes.OrangeRed;
-                btnConnect.Content = "Connect";
-                stackControls.Visibility = System.Windows.Visibility.Hidden;
+                MessageBox.Show("Socket exception: {0}", se.Data.ToString());
             }
         }
 
@@ -98,7 +105,7 @@ namespace TurtleTest
                     }
                     subscriptionState = (int)SubscriptionState.Subscribed;
                     btnSubscribe.Content = "Unsubscribe";
-                    bridgeLogic.SetUpdateListener();
+                    bridgeLogic.SetUpdateListener();                    
                 }
                 catch (Exception se)
                 {
@@ -198,7 +205,7 @@ namespace TurtleTest
                 bridgeLogic.Initialize(bridgeConfig.protocol+ "://" + txtIP.Text + ":" + txtPort.Text, this);
                 //bridgeLogic.Initialize(bridgeConfig.URI);
                 bridgeLogic.Connect();
-                return true;
+                return bridgeLogic.getConnectionState();
             }
             catch (Exception e)
             {
@@ -232,15 +239,22 @@ namespace TurtleTest
 
         public delegate void UpdateTextElements(String data);
 
-        public void laserScanCanvas(List<JToken> data)
+        public void laserScanCanvas(List<JToken> data, Double inc_angle, Double min_angle)
         {
             sensor_projection.Children.Clear();
+            laser_field.Children.Clear();
             Polyline plot = new Polyline();
+            Polyline laser_segment = new Polyline();
             plot.Stroke = System.Windows.Media.Brushes.MediumVioletRed;
+            laser_segment.Stroke = System.Windows.Media.Brushes.DarkViolet;
             plot.StrokeThickness = 1;
+            laser_segment.StrokeThickness = 1;
             PointCollection points = new PointCollection();
+            PointCollection field = new PointCollection();
             //var converter = TypeDescriptor.GetConverter(typeof(Double));
             Double x = 0;
+            Double currentAngle = min_angle;
+            Double min_val = 0;            
             foreach (var item in data)
             {
                 System.Diagnostics.Debug.WriteLine(item);
@@ -249,10 +263,74 @@ namespace TurtleTest
                     CultureInfo.CreateSpecificCulture("en-US"),
                     out yVal);                
                 points.Add(new Point(x,10*yVal));
+                field.Add(new Point(20*yVal * Math.Cos(currentAngle), 20*yVal * Math.Sin(currentAngle)));
                 x+= 1;
+                currentAngle += inc_angle;
+                if (yVal < min_val)
+                {
+                    min_val = yVal;
+                }
             }
             plot.Points = points;
+            laser_segment.Points = field;
             sensor_projection.Children.Add(plot);
+            laser_field.Children.Add(laser_segment);
+        }
+
+        private static string showState = "\"/DriveStates\"";
+        //private static string showState = "\"/turtle1/pose\"";
+        private static string laserScan = "/sick_s300/scan";
+        //private static string laserScan = "/scan_front";
+
+        private String valueToView(JObject jsonData, String attr)
+        {
+            String result = "";
+            try
+            {
+                var topic = Array.ConvertAll(jsonData["msg"][attr].ToArray(), o => (double)o);
+                foreach (var item in topic)
+                {
+                    result += item.ToString() + "\t";
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                result = jsonData["msg"][attr].ToString();
+            }
+            return result;
+        }
+
+        private void pushView(JObject jsonData)
+        {
+            if (jsonData["topic"].ToString().Equals(showState))
+            {
+                Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + valueToView(jsonData, bridgeConfig.ProjectedAttributes()[0].Item2)));
+                Dispatcher.Invoke(new Action(() => labelY.Content = "y: " + valueToView(jsonData, bridgeConfig.ProjectedAttributes()[1].Item2)));
+            }
+            else if (jsonData["topic"].ToString().Replace("\"", "").Equals(laserScan))
+            {
+                /*
+                var x1 = jsonData["msg"]["ranges"].ToList();
+                foreach (var itemx in ((IList<JToken>)x1))
+                {
+                    Console.WriteLine(itemx);
+                }
+                */
+                Double angle_inc;
+                Double min_angle;
+                Double.TryParse(jsonData["msg"]["angle_increment"].ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"), 
+                    out angle_inc);
+                Double.TryParse(jsonData["msg"]["angle_min"].ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out min_angle);
+
+                Dispatcher.Invoke(new Action(() =>
+                    laserScanCanvas(jsonData["msg"]["ranges"].ToList(), angle_inc, min_angle)));
+
+            }
         }
 
         public void ReceiveUpdate(String data)
@@ -261,36 +339,7 @@ namespace TurtleTest
             try
             {
                 // Debug messages
-                if (jsonData["topic"].ToString().Equals("\"/DriveStates\""))
-                {
-                    var topic_x = Array.ConvertAll(jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2].ToArray(), o => (double)o);
-                    Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + topic_x[0] + ",\t" + topic_x[1]));
-                    var topic_y = Array.ConvertAll(jsonData["msg"][bridgeConfig.ProjectedAttributes()[1].Item2].ToArray(), o => (double)o);
-                    Dispatcher.Invoke(new Action(() => labelY.Content = "y: " +topic_y[0] + ",\t" + topic_y[1]));                    
-                }
-                    /*
-                else if (jsonData["topic"].ToString().Equals("\"/turtle1/pose\""))
-                {
-                    Dispatcher.Invoke(new Action(() => labelX.Content = "x: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2]));
-                    Dispatcher.Invoke(new Action(() => labelY.Content = "y: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[1].Item2]));
-                    Dispatcher.Invoke(new Action(() => labelTheta.Content = "t: " + jsonData["msg"][bridgeConfig.ProjectedAttributes()[2].Item2] +
-                        " (Deg: " + Math.Round((float)jsonData["msg"][bridgeConfig.ProjectedAttributes()[0].Item2]
-                        * 180 / Math.PI, 4).ToString() + ")"));
-                }
-                     * */
-                else if (jsonData["topic"].ToString().Replace("\"","").Equals("/sick_s300/scan"))
-                {
-                    /*
-                    var x1 = jsonData["msg"]["ranges"].ToList();
-                    foreach (var itemx in ((IList<JToken>)x1))
-                    {
-                        Console.WriteLine(itemx);
-                    }
-                    */
-                    Dispatcher.Invoke(new Action(() =>
-                        laserScanCanvas(jsonData["msg"]["ranges"].ToList())));
-                    
-                }
+                pushView(jsonData);
             }
             catch (ArgumentNullException)
             {

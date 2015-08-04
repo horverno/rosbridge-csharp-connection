@@ -29,10 +29,17 @@
                 <Label x:Name="labelTheta"  Content="{Binding receiver}" />
             </StackPanel>
         </StackPanel>
-        <StackPanel Grid.Column="1">
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="300"/>
+                <RowDefinition Height="300"/>
+            </Grid.RowDefinitions>
             <Label Content="Laser scanner read ranges"/>
-            <Canvas x:Name="sensor_projection" Margin="2 2 2 2">
+            <Canvas Grid.Row="1" x:Name="sensor_projection" Margin="2 2 2 2">
             </Canvas>
-        </StackPanel>
+            <Canvas Grid.Row="2" x:Name="laser_field" Margin="50 2 2 2">
+            </Canvas>
+        </Grid>
     </Grid>
 </Window>

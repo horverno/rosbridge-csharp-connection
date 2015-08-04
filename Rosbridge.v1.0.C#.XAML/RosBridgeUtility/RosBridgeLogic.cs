@@ -104,18 +104,44 @@ namespace RosBridgeUtility
 
         public void Initialize(String ipaddress, IROSBridgeController parentwindow)
         {
-            ws = new WebSocket(ipaddress);
-            subject = parentwindow;
-            ws.OnMessage += UpdateOnReceive;
-            Console.Out.WriteLine("Initialized RosBridgeLogic component");
-            connected = false;
+            try
+            {
+                ws = new WebSocket(ipaddress);
+                subject = parentwindow;
+                ws.OnMessage += UpdateOnReceive;
+                Console.Out.WriteLine("Initialized RosBridgeLogic component");
+                connected = false;
+            }
+            catch (Exception se)
+            {
+                throw;
+            }
+        }
+
+        public Boolean getConnectionState()
+        {
+            return connected;
         }
 
         public void Connect()
         {
-            ws.Connect();
-            connected = true;
-            Console.Out.WriteLine("Successfully connected to: {0}", ws.Url);
+            try
+            {
+                ws.OnError += ws_OnError;
+                connected = true;
+                ws.Connect();                
+                Console.Out.WriteLine("Successfully connected to: {0}", ws.Url);
+            }
+            catch (Exception se)
+            {
+                throw;
+            }
+        }
+
+        public void ws_OnError(object sender, ErrorEventArgs e)
+        {            
+            Console.WriteLine("An error occured: {0}", e.Message);
+            connected = false;
         }
 
         public void Disconnect()
@@ -282,10 +308,6 @@ namespace RosBridgeUtility
             }
             catch (Exception se)
             {
-                /*
-                Console.WriteLine(se.Data);
-                return new List<Double>() {0};
-                 * */
                 throw se;
             }
         }
