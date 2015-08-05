@@ -19,7 +19,8 @@ rosrun turtlesim turtlesim_node
 In ROS you have to start:
 ```
 roscore
-roslaunch rosbridge_launch simple.launch 
+roslaunch rosbridge_launch simple.launch   or
+roslaunch rosbridge_launch http.launch
 rosrun turtlesim turtlesim_node
 ```
 
