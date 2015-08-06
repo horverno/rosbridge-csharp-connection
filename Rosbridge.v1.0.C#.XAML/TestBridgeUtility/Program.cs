@@ -46,7 +46,7 @@ namespace TestBridgeUtility
             Object[] driveActive = { true, true };
             Object[] quickStop = { false, false };
             Object[] disableBrake = { true, true };
-            logic.PublishNeobotixCommandMsg("/DriveCommands", linNeo, driveActive, quickStop, disableBrake);
+            //logic.PublishNeobotixCommandMsg("/DriveCommands", linNeo, driveActive, quickStop, disableBrake);
             System.Threading.Thread.Sleep(1000);
 
             logic.RemoveCollections(conf1.getTopicList());
@@ -56,7 +56,8 @@ namespace TestBridgeUtility
                 Console.Out.WriteLine(attr.Item2);
                 foreach (var item in logic.getResponseAttribute(attr.Item1, attr.Item2))
                 {
-                    Console.Out.WriteLine(((List<Double>)item)[0]);
+                    Console.WriteLine(item);
+                    //Console.Out.WriteLine(((List<Double>)item)[0]);
                     //Console.Out.WriteLine("{0}: {1} {2}", attr.Item1, ((List<Double>)item)[0], ((List<Double>)item)[1]);
                 }
             }

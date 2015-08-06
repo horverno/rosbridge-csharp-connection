@@ -1,16 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <rosbridge_config>
-  <network ipaddress="192.168.0.152" port="9090" protocol="ws"/>
+  <network ipaddress="10.2.94.180" port="9090" protocol="ws"/>
   <subscriptions>
-    <topic name="/sick_s300/scan"/>
-    <topic name="/DriveStates"/>
+    <topic name="/base_scan"/>
+    <topic name="/turtle1/pose"/>
+    <topic name="/base_odometry/odometer"/>
   </subscriptions>
   <publications>
-    <topic name="/DriveCommands" target="neobotix_mp500"/>
+    <topic name="/turtle1/cmd_vel" target="turtle"/>
   </publications>
   <projections>
-    <query topic="/DriveStates" attribute="angularPosition"/>
-    <query topic="/DriveStates" attribute="angularVelocity"/>
-    <query topic="/sick_s300/scan" attribute="ranges"/>
+    <query topic="/turtle1/pose" attribute="x"/>
+    <query topic="/turtle1/pose" attribute="y"/>
+    <query topic="/scan_front" attribute="ranges"/>
   </projections>
+  <visualization>
+    <scale r="10.0"/>
+    <laser_field topic="/base_scan"/>
+    <odometry topic="/base_odometry/odometer"/>
+    <showState topic="/DriveStates"/>
+  </visualization>
 </rosbridge_config>

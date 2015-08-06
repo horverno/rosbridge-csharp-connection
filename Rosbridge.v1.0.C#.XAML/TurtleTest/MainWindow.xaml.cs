@@ -35,6 +35,16 @@ namespace TurtleTest
         private RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse _responseObj = new RosBridgeDotNet.RosBridgeDotNet.TurtlePoseResponse();
         private static ManualResetEvent connectDone = new ManualResetEvent(false);
         private static ManualResetEvent sendDone = new ManualResetEvent(false);
+
+
+        private static string showState = "\"/DriveStates\"";
+        //private static string showState = "\"/turtle1/pose\"";
+        //private static string laserScan = "/sick_s300/scan";
+        private static string laserScan = "/base_scan";
+        private static string odometry = "/base_odometry/odometer";
+
+        private static double scaleFactor = 10;
+
         enum ConnectionState
         {
             Disconnected = 0, Connected
@@ -60,6 +70,17 @@ namespace TurtleTest
             Console.WriteLine("Ipaddress: {0}",bridgeConfig.ipaddress);
             txtIP.Text = bridgeConfig.ipaddress;
             txtPort.Text = bridgeConfig.port.ToString();
+            try
+            {
+                showState = bridgeConfig.showState;
+                laserScan = bridgeConfig.laserFieldTopic;
+                odometry = bridgeConfig.odometryTopic;
+                scaleFactor = bridgeConfig.vis_scaleFactor;
+            }
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine("Error during read: {0}",e.Data);
+            }
         }
         
 
@@ -239,12 +260,16 @@ namespace TurtleTest
 
         public delegate void UpdateTextElements(String data);
 
+        Polyline laser_segment = new Polyline();
+        Polyline plot = new Polyline();
+
         public void laserScanCanvas(List<JToken> data, Double inc_angle, Double min_angle)
         {
             sensor_projection.Children.Clear();
-            laser_field.Children.Clear();
-            Polyline plot = new Polyline();
-            Polyline laser_segment = new Polyline();
+            laser_field.Children.Remove(plot);
+            laser_field.Children.Remove(laser_segment);
+            laser_segment = new Polyline();
+            plot = new Polyline();
             plot.Stroke = System.Windows.Media.Brushes.MediumVioletRed;
             laser_segment.Stroke = System.Windows.Media.Brushes.DarkViolet;
             plot.StrokeThickness = 1;
@@ -262,8 +287,8 @@ namespace TurtleTest
                 Double.TryParse(item.ToString(), NumberStyles.Number, 
                     CultureInfo.CreateSpecificCulture("en-US"),
                     out yVal);                
-                points.Add(new Point(x,10*yVal));
-                field.Add(new Point(20*yVal * Math.Cos(currentAngle), 20*yVal * Math.Sin(currentAngle)));
+                points.Add(new Point(x,scaleFactor*yVal));
+                field.Add(new Point(scaleFactor*yVal * Math.Cos(currentAngle), scaleFactor*yVal * Math.Sin(currentAngle)));
                 x+= 1;
                 currentAngle += inc_angle;
                 if (yVal < min_val)
@@ -274,13 +299,12 @@ namespace TurtleTest
             plot.Points = points;
             laser_segment.Points = field;
             sensor_projection.Children.Add(plot);
+            Canvas.SetLeft(laser_segment, last_posX);
+            Canvas.SetTop(laser_segment, last_posY);
             laser_field.Children.Add(laser_segment);
         }
 
-        private static string showState = "\"/DriveStates\"";
-        //private static string showState = "\"/turtle1/pose\"";
-        private static string laserScan = "/sick_s300/scan";
-        //private static string laserScan = "/scan_front";
+        
 
         private String valueToView(JObject jsonData, String attr)
         {
@@ -299,6 +323,47 @@ namespace TurtleTest
             }
             return result;
         }
+
+        private double lastMeasuredDistance = 0;
+        private double lastMeasuredAngle = 0;
+        private Ellipse predictedPosition = new Ellipse();
+        private Line orientationCursor = new Line();
+
+        private double last_posX = 0;
+        private double last_posY = 0;
+
+        private void visualizeOdometry(Double newDistance, Double newAngle)
+        {
+            double diffDistance = newDistance - lastMeasuredDistance;
+            double diffAngle = newAngle - lastMeasuredAngle;
+            lastMeasuredDistance += diffDistance;
+            lastMeasuredAngle += diffAngle;
+            laser_field.Children.Remove(predictedPosition);
+            laser_field.Children.Remove(orientationCursor);
+            predictedPosition = new Ellipse();
+            orientationCursor = new Line();
+            predictedPosition.Width = 20;
+            predictedPosition.Height = 20;
+            predictedPosition.Stroke = System.Windows.Media.Brushes.DarkMagenta;
+            predictedPosition.StrokeThickness = 2;
+            laser_field.Children.Add(predictedPosition);
+            orientationCursor.Stroke = System.Windows.Media.Brushes.Indigo;
+            orientationCursor.StrokeThickness = 10;
+            orientationCursor.X1 = 0; orientationCursor.Y1 = 0;
+            orientationCursor.X2 = scaleFactor * 4 * Math.Cos(lastMeasuredAngle);
+            orientationCursor.Y2 = scaleFactor * 4 * Math.Sin(lastMeasuredAngle);
+            laser_field.Children.Add(orientationCursor);
+            last_posX += 10*Math.Cos(lastMeasuredAngle) * diffDistance;
+            last_posY += 10*Math.Sin(lastMeasuredAngle) * diffDistance;
+            Console.WriteLine("(X,Y): {0} {1}",last_posX,last_posY);
+            Console.WriteLine("(dist,angle): {0} {1}",diffDistance,diffAngle);
+            Console.WriteLine("(dist,angle): {0} {1}", lastMeasuredDistance, lastMeasuredAngle);
+            Canvas.SetLeft(predictedPosition, last_posX-5);
+            Canvas.SetTop(predictedPosition, last_posY-5);
+            Canvas.SetLeft(orientationCursor, last_posX);
+            Canvas.SetTop(orientationCursor, last_posY);
+        }
+
 
         private void pushView(JObject jsonData)
         {
@@ -330,6 +395,20 @@ namespace TurtleTest
                 Dispatcher.Invoke(new Action(() =>
                     laserScanCanvas(jsonData["msg"]["ranges"].ToList(), angle_inc, min_angle)));
 
+            }
+            else if (jsonData["topic"].ToString().Replace("\"", "").Equals(odometry))
+            {
+                Double measuredDistance;
+                Double measuredAngle;
+                Double.TryParse(jsonData["msg"]["distance"].ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out measuredDistance);
+                Double.TryParse(jsonData["msg"]["angle"].ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out measuredAngle);
+                Dispatcher.Invoke(new Action(() => visualizeOdometry(measuredDistance, measuredAngle)));
             }
         }
 

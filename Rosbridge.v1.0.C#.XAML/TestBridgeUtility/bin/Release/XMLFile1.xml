@@ -1,14 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <rosbridge_config>
-  <network ipaddress="192.168.0.151" port="9090" protocol="ws"/>
+  <network ipaddress="10.2.94.154" port="9090" protocol="ws"/>
   <subscriptions>
-    <topic name="/DriveStates"/>
+    <topic name="/base_odometry/odom"/>
+    <topic name="/base_odometry/odometer"/>
   </subscriptions>
   <publications>
-    <topic name="/DriveCommands"/>
+    <topic name="/turtle1/cmd_vel"/>
   </publications>
   <projections>
-    <query topic="/DriveStates" attribute="AngularVelocity"/>
-    <query topic="/DriveStates" attribute="AngularPositon"/>
+    <query topic="/base_odometry/odom" attribute="pose.pose.position.x.x"/>
+    <query topic="/base_odometry/odom" attribute="pose.pose.position.y.y"/>
+    <query topic="/base_odometry/odom" attribute="pose.pose.position.z.z"/>
+    <query topic="/base_odometry/odometer" attribute="distance"/>
+    <query topic="/base_odometry/odometer" attribute="angle"/>
   </projections>
 </rosbridge_config>
