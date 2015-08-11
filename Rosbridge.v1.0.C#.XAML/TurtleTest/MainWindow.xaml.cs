@@ -260,8 +260,8 @@ namespace TurtleTest
 
         public delegate void UpdateTextElements(String data);
 
-        Polyline laser_segment = new Polyline();
-        Polyline plot = new Polyline();
+        private Polyline laser_segment = new Polyline();
+        private Polyline plot = new Polyline();
 
         public void laserScanCanvas(List<JToken> data, Double inc_angle, Double min_angle)
         {
@@ -328,9 +328,19 @@ namespace TurtleTest
         private double lastMeasuredAngle = 0;
         private Ellipse predictedPosition = new Ellipse();
         private Line orientationCursor = new Line();
+        private PointCollection odometryData = new PointCollection();
+        private Polyline odometryLine = new Polyline();
+        private int odometryPointCnt = 0;
 
         private double last_posX = 0;
         private double last_posY = 0;
+        private double new_posX = 0;
+        private double new_posY = 0;
+        // Velocity data
+        private double last_posX_dot = 0;
+        private double last_posY_dot = 0;
+        private double new_posX_dot = 0;
+        private double new_posY_dot = 0;
 
         private void visualizeOdometry(Double newDistance, Double newAngle)
         {
@@ -340,6 +350,7 @@ namespace TurtleTest
             lastMeasuredAngle += diffAngle;
             laser_field.Children.Remove(predictedPosition);
             laser_field.Children.Remove(orientationCursor);
+            laser_field.Children.Remove(odometryLine);
             predictedPosition = new Ellipse();
             orientationCursor = new Line();
             predictedPosition.Width = 20;
@@ -353,17 +364,87 @@ namespace TurtleTest
             orientationCursor.X2 = scaleFactor * 4 * Math.Cos(lastMeasuredAngle);
             orientationCursor.Y2 = scaleFactor * 4 * Math.Sin(lastMeasuredAngle);
             laser_field.Children.Add(orientationCursor);
-            last_posX += 10*Math.Cos(lastMeasuredAngle) * diffDistance;
-            last_posY += 10*Math.Sin(lastMeasuredAngle) * diffDistance;
+            new_posX += 10*Math.Cos(lastMeasuredAngle) * diffDistance;
+            new_posY += 10*Math.Sin(lastMeasuredAngle) * diffDistance;
+            new_posX_dot = new_posX - last_posX;
+            new_posY_dot = new_posY - last_posY;
+            Console.WriteLine("Distance function: {0}",
+                Math.Sqrt(Math.Pow(new_posX - last_posX, 2) + Math.Pow(new_posY - last_posY, 2)));
+            Console.WriteLine("Acceleration, velocity: {0} {1}", new_posX_dot, new_posX_dot - last_posX_dot);
+            if (
+                Math.Sqrt(Math.Pow(new_posX-last_posX,2)+Math.Pow(new_posY-last_posY,2)) > 0.1
+                &&
+                Math.Sqrt(Math.Pow(new_posX_dot - last_posX_dot, 2) + 
+                Math.Pow(new_posY_dot - last_posY_dot, 2)) > 0.1)
+            {
+                odometryData.Add(new Point(last_posX, last_posY));
+                odometryLine = new Polyline();
+                odometryLine.Stroke = System.Windows.Media.Brushes.MediumVioletRed;
+                odometryLine.StrokeThickness = 2;
+                odometryLine.Points = odometryData;
+            }
+            else
+            {
+                odometryPointCnt++;
+            }
+            // Refresh curve values
+            last_posX = new_posX;
+            last_posY = new_posY;
+            last_posX_dot = new_posX_dot;
+            last_posY_dot = new_posY_dot;
             Console.WriteLine("(X,Y): {0} {1}",last_posX,last_posY);
             Console.WriteLine("(dist,angle): {0} {1}",diffDistance,diffAngle);
             Console.WriteLine("(dist,angle): {0} {1}", lastMeasuredDistance, lastMeasuredAngle);
+            
+            laser_field.Children.Add(odometryLine);
             Canvas.SetLeft(predictedPosition, last_posX-5);
             Canvas.SetTop(predictedPosition, last_posY-5);
             Canvas.SetLeft(orientationCursor, last_posX);
             Canvas.SetTop(orientationCursor, last_posY);
+            
         }
 
+        private void visualizeOdometry(Double x, Double y, Double newAngleZ, Double newAngle)
+        {
+            laser_field.Children.Remove(predictedPosition);
+            laser_field.Children.Remove(orientationCursor);
+            laser_field.Children.Remove(odometryLine);
+            
+
+            predictedPosition = new Ellipse();
+            orientationCursor = new Line();
+
+            predictedPosition.Width = 20;
+            predictedPosition.Height = 20;
+            predictedPosition.Stroke = System.Windows.Media.Brushes.DarkMagenta;
+            predictedPosition.StrokeThickness = 2;
+
+            orientationCursor.Stroke = System.Windows.Media.Brushes.Indigo;
+            orientationCursor.StrokeThickness = 10;
+            orientationCursor.X1 = 0; orientationCursor.Y1 = 0;
+            orientationCursor.X2 = scaleFactor * 4 * Math.Cos(newAngleZ);
+            orientationCursor.Y2 = scaleFactor * 4 * Math.Sin(newAngleZ);
+            laser_field.Children.Add(predictedPosition);
+            laser_field.Children.Add(orientationCursor);
+            double posX = scaleFactor * x;
+            double posY = scaleFactor * y;
+            odometryData.Add(new Point(posX, posY));
+            odometryLine = new Polyline();
+            odometryLine.Stroke = System.Windows.Media.Brushes.MediumVioletRed;
+            odometryLine.StrokeThickness = 2;
+            odometryLine.Points = odometryData;
+            // Refresh curve values
+            
+            laser_field.Children.Add(odometryLine);
+            Canvas.SetLeft(predictedPosition, posX - 5);
+            Canvas.SetTop(predictedPosition, posY - 5);
+            Canvas.SetLeft(orientationCursor, posX);
+            Canvas.SetTop(orientationCursor, posY);
+            last_posX = posX;
+            last_posY = posY;
+        }
+
+        int odometryCount = 0;
 
         private void pushView(JObject jsonData)
         {
@@ -398,17 +479,51 @@ namespace TurtleTest
             }
             else if (jsonData["topic"].ToString().Replace("\"", "").Equals(odometry))
             {
-                Double measuredDistance;
-                Double measuredAngle;
-                Double.TryParse(jsonData["msg"]["distance"].ToString(),
-                    NumberStyles.Number,
-                    CultureInfo.CreateSpecificCulture("en-US"),
-                    out measuredDistance);
-                Double.TryParse(jsonData["msg"]["angle"].ToString(),
-                    NumberStyles.Number,
-                    CultureInfo.CreateSpecificCulture("en-US"),
-                    out measuredAngle);
-                Dispatcher.Invoke(new Action(() => visualizeOdometry(measuredDistance, measuredAngle)));
+                odometryCount++;
+                Double measuredDistance = 0;
+                Double measuredAngle = 0;
+                if (bridgeConfig.target == "neobotix_mp500")
+                {
+                    /*Console.WriteLine(Double.TryParse(jsonData["msg"]["pose"]["pose"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out measuredDistance));
+                    */
+                    Double x, y, angleZ, angleW = 0;
+                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["x"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out x);
+                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["y"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out y);
+                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["z"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out angleZ);
+                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["w"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out angleW);
+                    if (odometryCount % 100 == 0)
+                    {
+                        Dispatcher.Invoke(new Action(() => visualizeOdometry(x, y, angleZ, angleW)));
+                    }
+                }
+                else
+                {
+                    Double.TryParse(jsonData["msg"]["distance"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out measuredDistance);
+                    Double.TryParse(jsonData["msg"]["angle"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out measuredAngle);
+                    Dispatcher.Invoke(new Action(() => visualizeOdometry(measuredDistance, measuredAngle)));
+                }
+                
             }
         }
 

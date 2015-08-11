@@ -15,6 +15,8 @@ namespace TestBridgeUtility
             conf1.readConfig("XMLFile1.xml");
             RosBridgeUtility.RosBridgeLogic logic = new RosBridgeUtility.RosBridgeLogic();
             logic.AddStoppedListener(logic_MonitoringStopped);
+            String fos = "[10, 10]";
+            Console.WriteLine(Array.ConvertAll(fos.Replace("[","").Replace("]","").Split(','), Double.Parse));
             logic.Initialize(conf1.URI);
             logic.Connect();
             logic.InitializeCollection();

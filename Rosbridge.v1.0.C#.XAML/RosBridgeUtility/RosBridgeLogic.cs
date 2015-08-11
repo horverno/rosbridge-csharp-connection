@@ -272,7 +272,7 @@ namespace RosBridgeUtility
             }            
             return resp;
         }
-
+        
         public System.Collections.IList getResponseAttribute(String topic, String field)
         {
             try
@@ -422,7 +422,7 @@ namespace RosBridgeUtility
                     throw new Exception("Invalid target");
             }
         }
-
+        
         private void PublishNeobotixMsg(double linear, double angular, IList<String> publicationList)
         {
             try
@@ -476,5 +476,24 @@ namespace RosBridgeUtility
                 throw new System.Net.Sockets.SocketException(10);
             }
         }
+
+        public RotRPY convertQuaternionToEuler(double x, double y, double z, double w)
+        {
+            RotRPY rot = new RotRPY();
+            rot.roll = Math.Atan2(2 * (x * y + y * z), 1 - 2 * (Math.Pow(y, 2) + Math.Pow(z, 2)));
+            rot.pitch = Math.Asin(2 * (x * z - w * y));
+            rot.yaw = Math.Atan2(2 * (x * w + y * z), 1 - 2 * (Math.Pow(z, 2) + Math.Pow(w, 2)));
+            return rot;
+        }
+    }
+
+    public struct RotRPY
+    {
+        // Rotation about x axis
+        public double roll;
+        // Rotation about y axis
+        public double pitch;
+        // Rotation about z axis
+        public double yaw;
     }
 }
