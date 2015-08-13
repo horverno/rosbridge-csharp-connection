@@ -404,7 +404,7 @@ namespace TurtleTest
             
         }
 
-        private void visualizeOdometry(Double x, Double y, Double newAngleZ, Double newAngle)
+        private void visualizeOdometry(Double x, Double y, Double newAngle)
         {
             laser_field.Children.Remove(predictedPosition);
             laser_field.Children.Remove(orientationCursor);
@@ -422,8 +422,8 @@ namespace TurtleTest
             orientationCursor.Stroke = System.Windows.Media.Brushes.Indigo;
             orientationCursor.StrokeThickness = 10;
             orientationCursor.X1 = 0; orientationCursor.Y1 = 0;
-            orientationCursor.X2 = scaleFactor * 4 * Math.Cos(newAngleZ);
-            orientationCursor.Y2 = scaleFactor * 4 * Math.Sin(newAngleZ);
+            orientationCursor.X2 = scaleFactor * 4 * Math.Cos(newAngle);
+            orientationCursor.Y2 = scaleFactor * 4 * Math.Sin(newAngle);
             laser_field.Children.Add(predictedPosition);
             laser_field.Children.Add(orientationCursor);
             double posX = scaleFactor * x;
@@ -482,14 +482,14 @@ namespace TurtleTest
                 odometryCount++;
                 Double measuredDistance = 0;
                 Double measuredAngle = 0;
-                if (bridgeConfig.target == "neobotix_mp500")
+                if (bridgeConfig.target == "neobotix_mp500" || bridgeConfig.target == "pr2")
                 {
                     /*Console.WriteLine(Double.TryParse(jsonData["msg"]["pose"]["pose"].ToString(),
                         NumberStyles.Number,
                         CultureInfo.CreateSpecificCulture("en-US"),
                         out measuredDistance));
                     */
-                    Double x, y, angleZ, angleW = 0;
+                    Double x, y, angleX, angleY, angleZ, angleW = 0;
                     Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["x"].ToString(),
                         NumberStyles.Number,
                         CultureInfo.CreateSpecificCulture("en-US"),
@@ -498,6 +498,14 @@ namespace TurtleTest
                         NumberStyles.Number,
                         CultureInfo.CreateSpecificCulture("en-US"),
                         out y);
+                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["x"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out angleX);
+                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["y"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out angleY);
                     Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["z"].ToString(),
                         NumberStyles.Number,
                         CultureInfo.CreateSpecificCulture("en-US"),
@@ -508,7 +516,10 @@ namespace TurtleTest
                         out angleW);
                     if (odometryCount % 100 == 0)
                     {
-                        Dispatcher.Invoke(new Action(() => visualizeOdometry(x, y, angleZ, angleW)));
+                        Console.WriteLine("X: {0}, Y: {1}, Z: {2}, W: {3}", angleX, angleY, angleZ, angleW);
+                        RosBridgeUtility.RotRPY currRot = bridgeLogic.convertQuaternionToEuler(angleX, angleY, angleZ, angleW);
+                        Console.WriteLine("Roll: {0}, Pitch: {1}, Yaw: {2}", currRot.roll, currRot.pitch, currRot.yaw);
+                        Dispatcher.Invoke(new Action(() => visualizeOdometry(x, y, currRot.yaw)));
                     }
                 }
                 else

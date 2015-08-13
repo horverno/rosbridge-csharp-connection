@@ -480,9 +480,9 @@ namespace RosBridgeUtility
         public RotRPY convertQuaternionToEuler(double x, double y, double z, double w)
         {
             RotRPY rot = new RotRPY();
-            rot.roll = Math.Atan2(2 * (x * y + y * z), 1 - 2 * (Math.Pow(y, 2) + Math.Pow(z, 2)));
-            rot.pitch = Math.Asin(2 * (x * z - w * y));
-            rot.yaw = Math.Atan2(2 * (x * w + y * z), 1 - 2 * (Math.Pow(z, 2) + Math.Pow(w, 2)));
+            rot.roll = Math.Atan2(2 * (w * x + y * z), 1 - 2 * (Math.Pow(x, 2) + Math.Pow(y, 2)));
+            rot.pitch = Math.Asin(2 * (w * y - z * x));
+            rot.yaw = Math.Atan2(2 * (w * z + x * y), 1 - 2 * (Math.Pow(y, 2) + Math.Pow(z, 2)));
             return rot;
         }
     }
