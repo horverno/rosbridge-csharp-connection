@@ -78,6 +78,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="WebController.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -109,12 +110,19 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="Public\Content\fonts\glyphicons-halflings-regular.ttf" />
+    <None Include="Public\Content\bootstrap\bootstrap-theme.css.map" />
+    <None Include="Public\Content\bootstrap\bootstrap.css.map" />
+    <None Include="Public\Content\fonts\glyphicons-halflings-regular.eot" />
+    <None Include="Public\Content\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="Public\Content\fonts\glyphicons-halflings-regular.woff2" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="Public\Scripts\jquery-1.9.1.min.map" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -148,6 +156,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="XMLFile1.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Public\Content\bootstrap\bootstrap-theme.css" />
+    <Content Include="Public\Content\bootstrap\bootstrap-theme.min.css" />
+    <Content Include="Public\Content\bootstrap\bootstrap.css" />
+    <Content Include="Public\Content\bootstrap\bootstrap.min.css" />
+    <Content Include="Public\Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Public\index.html" />
+    <Content Include="Public\JS\odomView.js" />
+    <Content Include="Public\Style.css" />
+    <Content Include="Public\Scripts\bootstrap.js" />
+    <Content Include="Public\Scripts\bootstrap.min.js" />
+    <Content Include="Public\Scripts\jquery-1.9.1.intellisense.js" />
+    <Content Include="Public\Scripts\jquery-1.9.1.js" />
+    <Content Include="Public\Scripts\jquery-1.9.1.min.js" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

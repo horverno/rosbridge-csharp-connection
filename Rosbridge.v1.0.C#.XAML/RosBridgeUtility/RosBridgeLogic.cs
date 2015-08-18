@@ -418,8 +418,39 @@ namespace RosBridgeUtility
                 case "neobotix_mp500":
                     PublishNeobotixMsg(linear, angular, publicationList);
                     break;
+                case "pr2":
+                    PublishPR2BaseControllerMessage(linear, angular, publicationList);
+                    break;
                 default:
                     throw new Exception("Invalid target");
+            }
+        }
+
+        private void PublishPR2BaseControllerMessage(double linear, double angular, IList<string> publicationList)
+        {
+            try
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    var v = new { linear = linear, angular = angular };
+                    Object[] lin = { linear, 0.0, 0.0 };
+                    Object[] ang = { 0.0, 0.0, angular };
+                    /*
+                    foreach (var item in bridgeConfig.getPublicationList())
+                    {
+                        this.PublishTwistMsg(item, lin, ang);
+                    }
+                     * */
+                    foreach (var item in publicationList)
+                    {
+                        this.PublishTwistMsg(item, lin, ang);
+                    }                    
+                }
+
+            }
+            catch (System.Net.Sockets.SocketException)
+            {
+                throw new System.Net.Sockets.SocketException(10);
             }
         }
         

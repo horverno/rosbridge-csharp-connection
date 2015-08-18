@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <link  rel="stylesheet" type="text/css" href="Content/bootstrap/bootstrap.css"/>
+    <script type="text/javascript" src="JS/odomView.js">
+
+    </script>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <nav class="navbar navbar-inverse">
+        <h2>Neobotix command panel</h2>        
+    </nav>
+    <div id="odom_output" class="well">
+        <div class="container">
+            <div class="col-sm-6">
+                <div class="panel panel-default" id="odometry_data">
+
+                </div>
+                <div class="panel panel-default" id="odometry_draw">
+                    <canvas id="odometry_canvas" />
+                </div>
+            </div>
+            <div class="col-sm-6">
+
+            </div>
+        </div>
+    </div>
+    <div id="kinect_output" class="well"></div>
+    <div id="control_panel" class="well">
+        <div class="btn-group">
+            <button type="button" class="btn btn-default" id="button_inc_vel">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>            
+            <button type="button" class="btn btn-default" id="button_move_forward">
+                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-default" id="button_dec_vel">
+                <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+            </button>
+        </div>
+        <br />
+        <div class="btn-group">
+            
+            <button type="button" class="btn btn-default" id="button_move_left">
+                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-default" id="button_move_backward">
+                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+            </button>
+            <button type="button" class="btn btn-default" id="button_move_right">
+                <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+</body>
+</html>

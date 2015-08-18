@@ -7,7 +7,7 @@
     <topic name="/base_odometry/odom"/>
   </subscriptions>
   <publications>
-    <topic name="/DriveCommands" target="pr2"/>
+    <topic name="/base_controller/command" target="pr2"/>
   </publications>
   <projections>
     <query topic="/DriveStates" attribute="angularPosition"/>

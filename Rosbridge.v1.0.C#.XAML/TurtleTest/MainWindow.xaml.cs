@@ -4,9 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Configuration;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -20,6 +19,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WebSocketSharp.Server;
+using WebSocketSharp.Net;
+using System.IO;
 
 namespace TurtleTest
 {
@@ -41,9 +43,15 @@ namespace TurtleTest
         //private static string showState = "\"/turtle1/pose\"";
         //private static string laserScan = "/sick_s300/scan";
         private static string laserScan = "/base_scan";
-        private static string odometry = "/base_odometry/odometer";
+        private static string odometry = "/base_odometry/odom";
 
         private static double scaleFactor = 10;
+
+        //private WebSocketServer NeobotixStateServer;
+        
+
+        // Web controller
+        private WebController wcon;
 
         enum ConnectionState
         {
@@ -69,18 +77,21 @@ namespace TurtleTest
             bridgeConfig.readConfig("XMLFile1.xml");
             Console.WriteLine("Ipaddress: {0}",bridgeConfig.ipaddress);
             txtIP.Text = bridgeConfig.ipaddress;
-            txtPort.Text = bridgeConfig.port.ToString();
+            txtPort.Text = bridgeConfig.port.ToString();            
             try
             {
                 showState = bridgeConfig.showState;
                 laserScan = bridgeConfig.laserFieldTopic;
                 odometry = bridgeConfig.odometryTopic;
                 scaleFactor = bridgeConfig.vis_scaleFactor;
+                wcon = new WebController(bridgeConfig, bridgeLogic);
             }
             catch (NullReferenceException e)
             {
                 Console.WriteLine("Error during read: {0}",e.Data);
             }
+            //NeobotixStateServer = new WebSocketServer("ws://localhost:9091");
+            
         }
         
 
@@ -88,7 +99,8 @@ namespace TurtleTest
         {
             try
             {
-
+                wcon.startWebServer();
+                
                 if (connectionState == (int)(ConnectionState.Disconnected))
                 {
                     if (ConnectToRos())
@@ -106,11 +118,11 @@ namespace TurtleTest
                     btnConnect.Background = Brushes.OrangeRed;
                     btnConnect.Content = "Connect";
                     stackControls.Visibility = System.Windows.Visibility.Hidden;
-                }
+                }                
             }
-            catch (Exception se)
+            catch (System.Net.Sockets.SocketException se)
             {
-                MessageBox.Show("Socket exception: {0}", se.Data.ToString());
+                MessageBox.Show(se.ToString());
             }
         }
 
@@ -252,7 +264,7 @@ namespace TurtleTest
                 }
                 
             }
-            catch (SocketException se)
+            catch (System.Net.Sockets.SocketException se)
             {
                 MessageBox.Show(se.Message);
             }
@@ -392,10 +404,11 @@ namespace TurtleTest
             last_posY = new_posY;
             last_posX_dot = new_posX_dot;
             last_posY_dot = new_posY_dot;
+            /*
             Console.WriteLine("(X,Y): {0} {1}",last_posX,last_posY);
             Console.WriteLine("(dist,angle): {0} {1}",diffDistance,diffAngle);
             Console.WriteLine("(dist,angle): {0} {1}", lastMeasuredDistance, lastMeasuredAngle);
-            
+            */
             laser_field.Children.Add(odometryLine);
             Canvas.SetLeft(predictedPosition, last_posX-5);
             Canvas.SetTop(predictedPosition, last_posY-5);
@@ -516,9 +529,9 @@ namespace TurtleTest
                         out angleW);
                     if (odometryCount % 100 == 0)
                     {
-                        Console.WriteLine("X: {0}, Y: {1}, Z: {2}, W: {3}", angleX, angleY, angleZ, angleW);
+                        //Console.WriteLine("X: {0}, Y: {1}, Z: {2}, W: {3}", angleX, angleY, angleZ, angleW);
                         RosBridgeUtility.RotRPY currRot = bridgeLogic.convertQuaternionToEuler(angleX, angleY, angleZ, angleW);
-                        Console.WriteLine("Roll: {0}, Pitch: {1}, Yaw: {2}", currRot.roll, currRot.pitch, currRot.yaw);
+                        //Console.WriteLine("Roll: {0}, Pitch: {1}, Yaw: {2}", currRot.roll, currRot.pitch, currRot.yaw);
                         Dispatcher.Invoke(new Action(() => visualizeOdometry(x, y, currRot.yaw)));
                     }
                 }
@@ -538,6 +551,8 @@ namespace TurtleTest
             }
         }
 
+        
+
         public void ReceiveUpdate(String data)
         {
             JObject jsonData = JObject.Parse(data);
@@ -545,6 +560,7 @@ namespace TurtleTest
             {
                 // Debug messages
                 pushView(jsonData);
+                wcon.updateMessages(jsonData);
             }
             catch (ArgumentNullException)
             {

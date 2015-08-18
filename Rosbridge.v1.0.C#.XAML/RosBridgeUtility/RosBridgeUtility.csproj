@@ -55,9 +55,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IROSBridgeController.cs" />
+    <Compile Include="IROSWebTeleopController.cs" />
     <Compile Include="RosBridgeConfig.cs" />
     <Compile Include="RosBridgeLogic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RosBridgeServer.cs" />
+    <Compile Include="RosMsg.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
