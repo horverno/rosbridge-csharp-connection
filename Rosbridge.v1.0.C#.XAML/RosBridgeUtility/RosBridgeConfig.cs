@@ -28,6 +28,11 @@ namespace RosBridgeUtility
         public String odometryTopic { get; set; }
         public String showState { get; set; }
 
+        public double max_vel { get; set; }
+        public double min_vel { get; set; }
+        public double inc_vel { get; set; }
+        public double init_vel { get; set; }
+
         private List<TopicObject> monitoredTopics;
         private List<Tuple<String, String>> projectedAttributes;
         private List<String> publications;
@@ -116,6 +121,38 @@ namespace RosBridgeUtility
             catch (NullReferenceException e)
             {
                 Console.WriteLine("One visualization does not exist, ignoring: {0}", e.Data);
+            }
+            try
+            {
+                double tmp;
+                Double.TryParse(doc.DocumentElement.SelectSingleNode("/rosbridge_config/velocity/linear/threshold").
+                    Attributes["max"].Value.ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out tmp);
+                max_vel = tmp;
+                Double.TryParse(doc.DocumentElement.SelectSingleNode("/rosbridge_config/velocity/linear/threshold").
+                    Attributes["min"].Value.ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out tmp);
+                min_vel = tmp;
+                Double.TryParse(doc.DocumentElement.SelectSingleNode("/rosbridge_config/velocity/linear/setup").
+                    Attributes["increment"].Value.ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out tmp);
+                inc_vel = tmp;
+                Double.TryParse(doc.DocumentElement.SelectSingleNode("/rosbridge_config/velocity/linear/setup").
+                    Attributes["init"].Value.ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out tmp);
+                init_vel = tmp;
+            }
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine("One velocity setup does not exist, ignoring: {0}", e.Data);
             }
         }
 

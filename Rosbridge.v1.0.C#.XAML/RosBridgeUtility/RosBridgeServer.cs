@@ -17,7 +17,8 @@ namespace RosBridgeUtility
     {
         public OdometryMsg lastOdom { get; set; }
         public Twist lastTeleopMsg { get; set; }
-        public LaserScanMsg lastLaserScanMsg { get; set; }
+        public String lastLaserScanMsg { get; set; }
+        public VelocityState lastStateMsg { get; set; }
     }
 
     public class StoringBehavior : WebSocketBehavior
@@ -65,6 +66,14 @@ namespace RosBridgeUtility
         public void setTeleop(IROSWebTeleopController tele)
         {
             teleopController = tele;
+        }
+    }
+    public class StateBehavior : StoringBehavior
+    {
+        public StateBehavior(ServerStorage ss) : base(ss) {}
+        protected override void OnMessage(WebSocketSharp.MessageEventArgs e)
+        {
+            Send(JsonConvert.SerializeObject(serverStorage.lastStateMsg));
         }
     }
 }

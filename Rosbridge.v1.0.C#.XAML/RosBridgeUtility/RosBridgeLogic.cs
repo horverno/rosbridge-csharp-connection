@@ -56,9 +56,7 @@ namespace RosBridgeUtility
             op = "publish";
         }
         public JObject msg { get; set; }
-    }
-
-
+    }    
 
     public class RosBridgeLogic
     {
@@ -67,9 +65,27 @@ namespace RosBridgeUtility
         IROSBridgeController subject;
         List<Tuple<String, String>> CollectedData;
         Boolean connected;
+        // Velocity threshold values
+        double velocity_increment = 0.1;
+        double max_velocity = 2.0;
+        double min_velocity = -2.0;
+        public double current_velocity { get; set; }
+        // Angular velocity threshold values
+        // In degrees (yet)
+        public VelocityState currentVelocityState { get; set; }
+        double angVelocity_increment = 15*Math.PI/180.0;
+        public double current_angVelocity { get; set; }
+
+        public String currentTarget { get; set; }
 
         public delegate void MonitoringStoppedHandler(object sender, EventArgs e);
         public event EventHandler MonitoringStopped;
+
+        public RosBridgeLogic()
+        {
+            currentVelocityState = new VelocityState();
+        }
+
         public void OnMonitoringStopped()
         {
             if (MonitoringStopped != null)
@@ -104,6 +120,8 @@ namespace RosBridgeUtility
 
         public void Initialize(String ipaddress, IROSBridgeController parentwindow)
         {
+            current_angVelocity = Math.PI / 2;
+            Console.WriteLine(current_velocity);
             try
             {
                 ws = new WebSocket(ipaddress);
@@ -114,8 +132,18 @@ namespace RosBridgeUtility
             }
             catch (Exception se)
             {
-                throw;
+                throw se;
             }
+        }
+
+        public void initVelocityThreshold(double min_vel, double max_vel,
+            double inc_vel, double init_vel)
+        {
+            max_velocity = max_vel;
+            min_velocity = min_vel;
+            velocity_increment = inc_vel;
+            current_velocity = init_vel;
+            Console.WriteLine(current_velocity);
         }
 
         public Boolean getConnectionState()
@@ -422,16 +450,73 @@ namespace RosBridgeUtility
                     PublishPR2BaseControllerMessage(linear, angular, publicationList);
                     break;
                 default:
-                    throw new Exception("Invalid target");
+                    throw new Exception("Invalid target: "+target);
             }
+        }
+
+        // Teleoperation commands
+
+        public void moveForward(IList<String> publications)
+        {
+            moveTarget(current_velocity, 0, currentTarget, publications);
+            currentVelocityState.current_vel = current_velocity;
+        }
+
+        public void moveBackward(IList<String> publications)
+        {
+            moveTarget(-current_velocity, 0, currentTarget, publications);
+            currentVelocityState.current_vel = current_velocity;
+        }
+
+        public void moveLeft(IList<String> publications)
+        {
+            moveTarget(current_velocity, current_angVelocity, 
+                currentTarget, publications);
+            currentVelocityState.current_vel = current_velocity;
+        }
+
+        public void moveRight(IList<String> publications)
+        {
+            moveTarget(current_velocity, -current_angVelocity,
+                currentTarget, publications);
+            currentVelocityState.current_vel = current_velocity;
+        }
+
+        public void decreaseVelocity()
+        {
+            if (current_velocity > min_velocity)
+            {
+                current_velocity -= velocity_increment;
+            }
+            currentVelocityState.current_vel = current_velocity;
+        }
+
+        public void increaseVelocity()
+        {
+            if (current_velocity < max_velocity)
+            {
+                current_velocity += velocity_increment;
+            }
+            currentVelocityState.current_vel = current_velocity;            
+        }
+
+        public void setCurrentVelocity(double velocity)
+        {
+            current_velocity = velocity;
+        }
+
+        public void stopTarget(IList<String> publications)
+        {
+            moveTarget(0, 0, currentTarget, publications);
+            currentVelocityState.current_vel = current_velocity;
         }
 
         private void PublishPR2BaseControllerMessage(double linear, double angular, IList<string> publicationList)
         {
             try
             {
-                for (int i = 0; i < 100; i++)
-                {
+                //for (int i = 0; i < 100; i++)
+                //{
                     var v = new { linear = linear, angular = angular };
                     Object[] lin = { linear, 0.0, 0.0 };
                     Object[] ang = { 0.0, 0.0, angular };
@@ -445,7 +530,7 @@ namespace RosBridgeUtility
                     {
                         this.PublishTwistMsg(item, lin, ang);
                     }                    
-                }
+                //}
 
             }
             catch (System.Net.Sockets.SocketException)

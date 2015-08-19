@@ -20,4 +20,10 @@
     <odometry topic="/base_odometry/odom"/>
     <showState topic="/DriveStates"/>
   </visualization>
+  <velocity>
+    <linear>
+      <threshold max="2.0" min="-2.0"/>
+      <setup increment="0.1" init="0.1"/>
+    </linear>
+  </velocity>
 </rosbridge_config>

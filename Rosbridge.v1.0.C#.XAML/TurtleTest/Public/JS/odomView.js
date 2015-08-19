@@ -1,5 +1,6 @@
-﻿var url_odom = "ws://localhost:4649/neobot_odom";
-var url_teleop = "ws://localhost:4649/neobot_teleop";
+﻿var url_odom = "ws://10.2.250.239:4649/neobot_odom";
+var url_teleop = "ws://10.2.250.239:4649/neobot_teleop";
+var url_state = "ws://10.2.250.239:4649/server_state";
 
 var output_odom;
 
@@ -8,18 +9,23 @@ var angVel = Math.PI/2.0;
 
 function init() {
     output_odom = document.getElementById("odometry_data");
+    state_panel = document.getElementById("state_panel");
+
+    // Buttons
     btn_forward = document.getElementById("button_move_forward");
     btn_forward.addEventListener("click", moveForward, false);
-    btn_forward = document.getElementById("button_move_backward");
-    btn_forward.addEventListener("click", moveBackward, false);
-    btn_forward = document.getElementById("button_move_left");
-    btn_forward.addEventListener("click", moveLeft, false);
-    btn_forward = document.getElementById("button_move_right");
-    btn_forward.addEventListener("click", moveRight, false);
-    btn_forward = document.getElementById("button_dec_vel");
-    btn_forward.addEventListener("click", decreaseVelocity, false);
-    btn_forward = document.getElementById("button_inc_vel");
-    btn_forward.addEventListener("click", increaseVelocity, false);
+    btn_backward = document.getElementById("button_move_backward");
+    btn_backward.addEventListener("click", moveBackward, false);
+    btn_left = document.getElementById("button_move_left");
+    btn_left.addEventListener("click", moveLeft, false);
+    btn_right = document.getElementById("button_move_right");
+    btn_right.addEventListener("click", moveRight, false);
+    btn_dec = document.getElementById("button_dec_vel");
+    btn_dec.addEventListener("click", decreaseVelocity, false);
+    btn_inc = document.getElementById("button_inc_vel");
+    btn_inc.addEventListener("click", increaseVelocity, false);
+    btn_stop = document.getElementById("button_stop");
+    btn_stop.addEventListener("click", stopVelocity);
     doWebSocket_odom();
     websocket_teleop = new WebSocket(url_teleop);
     websocket_teleop.onopen = function (evt) {
@@ -28,30 +34,32 @@ function init() {
     websocket_teleop.onmessage = function (evt) {
         console.log(evt.data);
     };
+    websocket_state = new WebSocket(url_state);
+    websocket_state.onmessage = function (evt) {
+        state_OnMsg(evt);
+    }
 }
 
-function decreaseVelocity() {
-    linVel -= 0.1;
-}
 
-function increaseVelocity() {
-    linVel += 0.1;
+function doWebSocket_State() {
+    websocket_state.send("state");
 }
 
 function sendTeleop(cmd) {
-    //websocket_teleop = new WebSocket(url_teleop);    
     var teleop_msg = { command: cmd }
-    /*
-    websocket_teleop.onopen = function (evt) {
-        console.log(JSON.stringify(teleop_msg, null, 2));
-        websocket_teleop.send(JSON.stringify(teleop_msg, null, 2));        
-    };
-    websocket_teleop.onmessage = function (evt) {
-        console.log(evt.data);
-    };
-    */
     
     websocket_teleop.send(JSON.stringify(teleop_msg, null, 2));
+}
+
+function state_OnMsg(evt) {
+    // Parse state
+    var state_obj = JSON.parse(evt.data);
+    // Output these data
+    p1 = state_panel.getElementsByTagName("p");
+    for (var i = 0; i < p1.length; i++) {
+        state_panel.removeChild(p1[i]);
+    }
+    writeState("Current velocity: "+state_obj.current_vel);    
 }
 
 function doWebSocket_odom() {
@@ -68,6 +76,13 @@ function doWebSocket_odom() {
     websocket.onerror = function (evt) {
         onError(evt)
     };
+}
+
+function writeState(message) {
+    var state_pre = document.createElement("p");
+    state_pre.style.wordWrap = "break-word";
+    state_pre.innerHTML = message;
+    state_panel.appendChild(state_pre);
 }
 
 function writeOdometry(message){
@@ -133,7 +148,8 @@ function onMessage(evt) {
     p1 = output_odom.getElementsByTagName("p");
     for (var i = 0; i < p1.length; i++) {
         output_odom.removeChild(p1[i]);
-    }    
+    }
+    console.log(evt.data);
     writeOdometry("x: " + odom_obj.x);
     writeOdometry("y: " + odom_obj.y);
     writeOdometry("z: " + odom_obj.z);
@@ -167,7 +183,22 @@ function moveRight(evt) {
     sendTeleop("right");
 }
 
-window.setInterval(function () { doWebSocket_odom(); }, 1000);
+function stopVelocity() {
+    sendTeleop("stop");
+}
+
+function decreaseVelocity() {
+    sendTeleop("dec_velocity");
+}
+
+function increaseVelocity() {
+    sendTeleop("inc_velocity");
+}
+
+window.setInterval(function () {
+    doWebSocket_State();
+    doWebSocket_odom();
+}, 1000);
 
 
 window.addEventListener("load", init, false);

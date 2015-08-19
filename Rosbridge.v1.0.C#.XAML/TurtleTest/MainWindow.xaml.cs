@@ -67,6 +67,7 @@ namespace TurtleTest
         public MainWindow()
         {
             InitializeComponent();
+            //bridgeLogic.currentVelocityState = new RosBridgeUtility.VelocityState();
             stackControls.Visibility = System.Windows.Visibility.Hidden;
             this.DataContext = _responseObj;
             this.bridgeLogic = new RosBridgeUtility.RosBridgeLogic();
@@ -76,8 +77,16 @@ namespace TurtleTest
             this.bridgeConfig = new RosBridgeUtility.RosBridgeConfig();
             bridgeConfig.readConfig("XMLFile1.xml");
             Console.WriteLine("Ipaddress: {0}",bridgeConfig.ipaddress);
+            bridgeLogic.currentTarget = bridgeConfig.target;
+            bridgeLogic.initVelocityThreshold(bridgeConfig.min_vel, bridgeConfig.max_vel, 
+                bridgeConfig.inc_vel, bridgeConfig.init_vel);
+            txtLgth.Text = bridgeLogic.current_velocity.ToString();
             txtIP.Text = bridgeConfig.ipaddress;
-            txtPort.Text = bridgeConfig.port.ToString();            
+            txtPort.Text = bridgeConfig.port.ToString();
+            bridgeLogic.currentVelocityState.inc_vel = bridgeConfig.inc_vel;
+            bridgeLogic.currentVelocityState.max_vel = bridgeConfig.max_vel;
+            bridgeLogic.currentVelocityState.min_vel = bridgeConfig.min_vel;
+            bridgeLogic.currentVelocityState.current_vel = bridgeConfig.init_vel;
             try
             {
                 showState = bridgeConfig.showState;
@@ -90,6 +99,7 @@ namespace TurtleTest
             {
                 Console.WriteLine("Error during read: {0}",e.Data);
             }
+            wcon.updateVelocityState(bridgeLogic.currentVelocityState);
             //NeobotixStateServer = new WebSocketServer("ws://localhost:9091");
             
         }
@@ -170,10 +180,13 @@ namespace TurtleTest
             return deg * Math.PI / 180.0;
         }
 
+        
+
         private void moveForward()
         {
-            bridgeLogic.moveTarget(Double.Parse(txtLgth.Text), 0,
-                bridgeConfig.target, bridgeConfig.getPublicationList());
+            bridgeLogic.setCurrentVelocity(Double.Parse(txtLgth.Text));
+            bridgeLogic.moveForward(bridgeConfig.getPublicationList());
+            updateVelocityState();            
         }
 
         private void btnForward_Click(object sender, RoutedEventArgs e)
@@ -183,46 +196,53 @@ namespace TurtleTest
 
         private void moveBackward()
         {
-            bridgeLogic.moveTarget(-Double.Parse(txtLgth.Text), 0,
-                bridgeConfig.target, bridgeConfig.getPublicationList());
+
+            bridgeLogic.setCurrentVelocity(Double.Parse(txtLgth.Text));
+            bridgeLogic.moveBackward(bridgeConfig.getPublicationList());
+            updateVelocityState();            
         }
 
         private void btnBackward_Click(object sender, RoutedEventArgs e)
         {
-            //PublishturtleMessage(-Double.Parse(txtLgth.Text), 0);
             moveBackward();
         }
 
         private void moveLeft()
         {
-            bridgeLogic.moveTarget(Double.Parse(txtLgth.Text), convertTextBlocktoRadians(),
-                bridgeConfig.target, bridgeConfig.getPublicationList());
+            bridgeLogic.setCurrentVelocity(Double.Parse(txtLgth.Text));
+            bridgeLogic.current_angVelocity = convertTextBlocktoRadians();
+            bridgeLogic.moveLeft(bridgeConfig.getPublicationList());
+            updateVelocityState();
         }
 
         private void btnLeft_Click(object sender, RoutedEventArgs e)
         {
-            //PublishturtleMessage(Double.Parse(txtLgth.Text), convertTextBlocktoRadians());
             moveLeft();
         }
 
         private void moveRight()
         {
-            bridgeLogic.moveTarget(Double.Parse(txtLgth.Text), -convertTextBlocktoRadians(),
-                bridgeConfig.target, bridgeConfig.getPublicationList());
+            bridgeLogic.setCurrentVelocity(Double.Parse(txtLgth.Text));
+            bridgeLogic.current_angVelocity = convertTextBlocktoRadians();
+            bridgeLogic.moveRight(bridgeConfig.getPublicationList());
+            updateVelocityState();            
         }
 
         private void btnRight_Click(object sender, RoutedEventArgs e)
         {
-            moveRight();
-            //PublishturtleMessage(Double.Parse(txtLgth.Text), -convertTextBlocktoRadians());
-            //Update();
+            moveRight();            
         }
         /// <summary>
         /// Return true if connection was succesful
         /// </summary>
         /// <returns></returns>
         /// 
-
+        public void updateVelocityState()
+        {
+            bridgeLogic.currentVelocityState.current_vel = bridgeLogic.current_velocity;
+            Console.WriteLine(bridgeLogic.currentVelocityState.current_vel);
+            wcon.updateVelocityState(bridgeLogic.currentVelocityState);
+        }             
         
 
         bool ConnectToRos()
@@ -570,8 +590,12 @@ namespace TurtleTest
 
         private void moveStopped()
         {
+            bridgeLogic.stopTarget(bridgeConfig.getPublicationList());
+            updateVelocityState();
+            /*
             bridgeLogic.moveTarget(0, 0,
                 bridgeConfig.target, bridgeConfig.getPublicationList());
+             * */
         }
 
         private void btnStop_Click(object sender, RoutedEventArgs e)
@@ -607,15 +631,21 @@ namespace TurtleTest
                     break;
                 case Key.Add:
                     Double.TryParse(txtLgth.Text,out vel);
-                    txtLgth.Text = (vel + 0.1).ToString();
+                    bridgeLogic.increaseVelocity();
+                    updateVelocityState();            
+                    txtLgth.Text = bridgeLogic.current_velocity.ToString();
+                    //txtLgth.Text = (vel + 0.1).ToString();
                     break;
                 case Key.Subtract:
                     Double.TryParse(txtLgth.Text,out vel);
-                    txtLgth.Text = (vel - 0.1).ToString();
+                    bridgeLogic.decreaseVelocity();
+                    updateVelocityState();
+                    txtLgth.Text = bridgeLogic.current_velocity.ToString();
+                    //txtLgth.Text = (vel - 0.1).ToString();
                     break;
                 case Key.K:
                     Double.TryParse(txtTheta.Text, out vel);
-                    txtTheta.Text = (vel + 15).ToString();
+                    //txtTheta.Text = (vel + 15).ToString();
                     break;
                 case Key.L:
                     Double.TryParse(txtTheta.Text, out vel);

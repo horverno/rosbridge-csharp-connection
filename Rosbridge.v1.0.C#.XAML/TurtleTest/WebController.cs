@@ -63,34 +63,38 @@ namespace TurtleTest
             NeobotixStateServer.OnPut += NeobotixStateServer_OnPut;
             NeobotixStateServer.AddWebSocketService<RosBridgeUtility.OdometryBehavior>(("/neobot_odom"), 
                 () => new RosBridgeUtility.OdometryBehavior(LastMsgs));
-            switch (conf.target)
-            {
-                case "pr2":
-                    Console.WriteLine("Added behavior for pr2");
-                    NeobotixStateServer.AddWebSocketService<RosBridgeUtility.TeleopKeyBehavior>(("/neobot_teleop"),
-                        () => new RosBridgeUtility.TeleopKeyBehavior(LastMsgs, this));
-                    break;
-            }
+            NeobotixStateServer.AddWebSocketService<RosBridgeUtility.StateBehavior>(("/server_state"),
+                () => new RosBridgeUtility.StateBehavior(LastMsgs));
+            NeobotixStateServer.AddWebSocketService<RosBridgeUtility.TeleopKeyBehavior>(("/neobot_teleop"),
+                () => new RosBridgeUtility.TeleopKeyBehavior(LastMsgs, this));
+            
         }
 
         public void teleopTarget(String request)
         {
             JObject msg = JObject.Parse(request);
-            double lin = 1.0;
-            double ang = Math.PI / 2;
             switch (msg["command"].ToString().Replace("\"",""))
             {
                 case "forward":
-                    parent.moveTarget(lin, 0, conf.target, conf.getPublicationList());
+                    parent.moveForward(conf.getPublicationList());
                     break;
                 case "backward":
-                    parent.moveTarget(-lin, 0, conf.target, conf.getPublicationList());
+                    parent.moveBackward(conf.getPublicationList());
                     break;
                 case "left":
-                    parent.moveTarget(lin, ang, conf.target, conf.getPublicationList());
+                    parent.moveLeft(conf.getPublicationList());
                     break;
                 case "right":
-                    parent.moveTarget(lin, -ang, conf.target, conf.getPublicationList());
+                    parent.moveRight(conf.getPublicationList());
+                    break;
+                case "inc_velocity":
+                    parent.increaseVelocity();
+                    break;
+                case "dec_velocity":
+                    parent.decreaseVelocity();
+                    break;
+                case "stop":
+                    parent.stopTarget(conf.getPublicationList());
                     break;
             }
             
@@ -110,6 +114,11 @@ namespace TurtleTest
         {
             NeobotixStateServer.Stop();
         }
+
+        public void updateVelocityState(RosBridgeUtility.VelocityState msg)
+        {
+            LastMsgs.lastStateMsg = msg;
+        }        
 
         public void updateMessages(JObject jsonData)
         {
@@ -154,6 +163,19 @@ namespace TurtleTest
                 msg.ori_y = angleY;
                 msg.ori_z = angleZ;
                 LastMsgs.lastOdom = msg;
+            }
+            if (jsonData["topic"].ToString().Replace("\"", "").Equals(conf.laserFieldTopic))
+            {
+                Double angle_inc;
+                Double min_angle;
+                Double.TryParse(jsonData["msg"]["angle_increment"].ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out angle_inc);
+                Double.TryParse(jsonData["msg"]["angle_min"].ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out min_angle);                
             }
         }
     }

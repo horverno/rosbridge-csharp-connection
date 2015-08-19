@@ -61,6 +61,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RosBridgeServer.cs" />
     <Compile Include="RosMsg.cs" />
+    <Compile Include="VelocityState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

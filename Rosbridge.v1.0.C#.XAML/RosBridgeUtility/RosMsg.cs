@@ -29,7 +29,8 @@ namespace RosBridgeUtility
 
     public class LaserScanMsg
     {
+        public double min_angle { get; set; }
         public double angle_increment { get; set; }
-        public double[] intensities { get; set; }
+        public double[] ranges { get; set; }
     }
 }
