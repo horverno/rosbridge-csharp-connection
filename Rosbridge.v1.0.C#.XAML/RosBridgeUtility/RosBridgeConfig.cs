@@ -28,10 +28,16 @@ namespace RosBridgeUtility
         public String odometryTopic { get; set; }
         public String showState { get; set; }
 
+        // Velocity setup
         public double max_vel { get; set; }
         public double min_vel { get; set; }
         public double inc_vel { get; set; }
         public double init_vel { get; set; }
+        // Angular setup
+        public double max_ang { get; set; }
+        public double min_ang { get; set; }
+        public double inc_ang { get; set; }
+        public double init_ang { get; set; }
 
         private List<TopicObject> monitoredTopics;
         private List<Tuple<String, String>> projectedAttributes;
@@ -153,6 +159,38 @@ namespace RosBridgeUtility
             catch (NullReferenceException e)
             {
                 Console.WriteLine("One velocity setup does not exist, ignoring: {0}", e.Data);
+            }
+            try
+            {
+                double tmp;
+                Double.TryParse(doc.DocumentElement.SelectSingleNode("/rosbridge_config/velocity/angular/threshold").
+                    Attributes["max"].Value.ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out tmp);
+                max_ang = tmp;
+                Double.TryParse(doc.DocumentElement.SelectSingleNode("/rosbridge_config/velocity/angular/threshold").
+                    Attributes["min"].Value.ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out tmp);
+                min_ang = tmp;
+                Double.TryParse(doc.DocumentElement.SelectSingleNode("/rosbridge_config/velocity/angular/setup").
+                    Attributes["increment"].Value.ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out tmp);
+                inc_ang = tmp;
+                Double.TryParse(doc.DocumentElement.SelectSingleNode("/rosbridge_config/velocity/angular/setup").
+                    Attributes["init"].Value.ToString(),
+                    NumberStyles.Number,
+                    CultureInfo.CreateSpecificCulture("en-US"),
+                    out tmp);
+                init_ang = tmp;
+            }
+            catch (NullReferenceException e)
+            {
+                Console.WriteLine("One angular velocity setup does not exist, ignoring: {0}", e.Data);
             }
         }
 

@@ -4,9 +4,6 @@ var url_state = "ws://10.2.250.239:4649/server_state";
 
 var output_odom;
 
-var linVel = 1.0;
-var angVel = Math.PI/2.0;
-
 function init() {
     output_odom = document.getElementById("odometry_data");
     state_panel = document.getElementById("state_panel");
@@ -24,6 +21,12 @@ function init() {
     btn_dec.addEventListener("click", decreaseVelocity, false);
     btn_inc = document.getElementById("button_inc_vel");
     btn_inc.addEventListener("click", increaseVelocity, false);
+    // Button Ang
+    btn_dec_ang = document.getElementById("btn_dec_ang");
+    btn_dec_ang.addEventListener("click", decreaseVelocityAng, false);
+    btn_inc_ang = document.getElementById("btn_inc_ang");
+    btn_inc_ang.addEventListener("click", increaseVelocityAng, false);
+    // Button stop
     btn_stop = document.getElementById("button_stop");
     btn_stop.addEventListener("click", stopVelocity);
     doWebSocket_odom();
@@ -39,6 +42,7 @@ function init() {
         state_OnMsg(evt);
     }
 }
+
 
 
 function doWebSocket_State() {
@@ -59,7 +63,8 @@ function state_OnMsg(evt) {
     for (var i = 0; i < p1.length; i++) {
         state_panel.removeChild(p1[i]);
     }
-    writeState("Current velocity: "+state_obj.current_vel);    
+    writeState("Current linear velocity: " + state_obj.current_vel);
+    writeState("Current angular velocity: " + state_obj.currentTheta);
 }
 
 function doWebSocket_odom() {
@@ -193,6 +198,14 @@ function decreaseVelocity() {
 
 function increaseVelocity() {
     sendTeleop("inc_velocity");
+}
+
+function decreaseVelocityAng() {
+    sendTeleop("dec_ang");
+}
+
+function increaseVelocityAng() {
+    sendTeleop("inc_ang");
 }
 
 window.setInterval(function () {

@@ -73,8 +73,10 @@ namespace RosBridgeUtility
         // Angular velocity threshold values
         // In degrees (yet)
         public VelocityState currentVelocityState { get; set; }
-        double angVelocity_increment = 15*Math.PI/180.0;
+        public double angVelocity_increment { get; set; }
         public double current_angVelocity { get; set; }
+        double min_ang = 0;
+        double max_ang = 0;
 
         public String currentTarget { get; set; }
 
@@ -120,7 +122,6 @@ namespace RosBridgeUtility
 
         public void Initialize(String ipaddress, IROSBridgeController parentwindow)
         {
-            current_angVelocity = Math.PI / 2;
             Console.WriteLine(current_velocity);
             try
             {
@@ -144,6 +145,15 @@ namespace RosBridgeUtility
             velocity_increment = inc_vel;
             current_velocity = init_vel;
             Console.WriteLine(current_velocity);
+        }
+
+        public void initAngularVelocityThreshold(double min_ang, double max_ang,
+            double inc_ang, double init_ang)
+        {
+            this.max_ang = degToRad(max_ang);
+            this.min_ang = degToRad(min_ang);
+            angVelocity_increment = degToRad(inc_ang);
+            this.current_angVelocity = degToRad(init_ang);
         }
 
         public Boolean getConnectionState()
@@ -470,14 +480,14 @@ namespace RosBridgeUtility
 
         public void moveLeft(IList<String> publications)
         {
-            moveTarget(current_velocity, current_angVelocity, 
+            moveTarget(current_velocity, current_angVelocity,
                 currentTarget, publications);
             currentVelocityState.current_vel = current_velocity;
         }
 
         public void moveRight(IList<String> publications)
         {
-            moveTarget(current_velocity, -current_angVelocity,
+            moveTarget(current_velocity, current_angVelocity,
                 currentTarget, publications);
             currentVelocityState.current_vel = current_velocity;
         }
@@ -489,6 +499,12 @@ namespace RosBridgeUtility
                 current_velocity -= velocity_increment;
             }
             currentVelocityState.current_vel = current_velocity;
+            
+        }
+
+        public double degToRad(double deg)
+        {
+            return deg * Math.PI / 180.0;
         }
 
         public void increaseVelocity()
@@ -498,6 +514,24 @@ namespace RosBridgeUtility
                 current_velocity += velocity_increment;
             }
             currentVelocityState.current_vel = current_velocity;            
+        }
+
+        public void increaseAngVelocity()
+        {
+            if (current_angVelocity < max_ang)
+            {
+                current_angVelocity += angVelocity_increment;
+            }
+            currentVelocityState.currentTheta = current_angVelocity;
+        }
+
+        public void decreaseAngVelocity()
+        {
+            if (current_angVelocity > min_ang)
+            {
+                current_angVelocity -= angVelocity_increment;
+            }
+            currentVelocityState.currentTheta = current_angVelocity;
         }
 
         public void setCurrentVelocity(double velocity)

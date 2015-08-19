@@ -11,5 +11,7 @@ namespace RosBridgeUtility
         public double min_vel { get; set; }
         public double inc_vel { get; set; }
         public double current_vel { get; set; }
+
+        public double currentTheta { get; set; }
     }
 }

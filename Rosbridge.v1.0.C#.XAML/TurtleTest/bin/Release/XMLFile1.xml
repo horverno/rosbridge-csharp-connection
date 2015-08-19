@@ -25,5 +25,9 @@
       <threshold max="2.0" min="-2.0"/>
       <setup increment="0.1" init="0.1"/>
     </linear>
+    <angular>
+      <threshold max="15.0" min="-15.0"/>
+      <setup increment="1" init="10"/>
+    </angular>
   </velocity>
 </rosbridge_config>

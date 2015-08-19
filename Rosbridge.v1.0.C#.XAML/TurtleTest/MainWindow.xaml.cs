@@ -45,6 +45,8 @@ namespace TurtleTest
         private static string laserScan = "/base_scan";
         private static string odometry = "/base_odometry/odom";
 
+        private RosBridgeUtility.RotRPY currRot;
+
         private static double scaleFactor = 10;
 
         //private WebSocketServer NeobotixStateServer;
@@ -80,13 +82,17 @@ namespace TurtleTest
             bridgeLogic.currentTarget = bridgeConfig.target;
             bridgeLogic.initVelocityThreshold(bridgeConfig.min_vel, bridgeConfig.max_vel, 
                 bridgeConfig.inc_vel, bridgeConfig.init_vel);
+            bridgeLogic.initAngularVelocityThreshold(bridgeConfig.min_ang, bridgeConfig.max_ang,
+                bridgeConfig.inc_ang, bridgeConfig.init_ang);
             txtLgth.Text = bridgeLogic.current_velocity.ToString();
             txtIP.Text = bridgeConfig.ipaddress;
             txtPort.Text = bridgeConfig.port.ToString();
+            txtTheta.Text = bridgeLogic.current_angVelocity.ToString();
             bridgeLogic.currentVelocityState.inc_vel = bridgeConfig.inc_vel;
             bridgeLogic.currentVelocityState.max_vel = bridgeConfig.max_vel;
             bridgeLogic.currentVelocityState.min_vel = bridgeConfig.min_vel;
             bridgeLogic.currentVelocityState.current_vel = bridgeConfig.init_vel;
+            bridgeLogic.currentVelocityState.currentTheta = bridgeConfig.init_ang;
             try
             {
                 showState = bridgeConfig.showState;
@@ -240,6 +246,7 @@ namespace TurtleTest
         public void updateVelocityState()
         {
             bridgeLogic.currentVelocityState.current_vel = bridgeLogic.current_velocity;
+            bridgeLogic.currentVelocityState.currentTheta = bridgeLogic.current_angVelocity;
             Console.WriteLine(bridgeLogic.currentVelocityState.current_vel);
             wcon.updateVelocityState(bridgeLogic.currentVelocityState);
         }             
@@ -320,7 +327,8 @@ namespace TurtleTest
                     CultureInfo.CreateSpecificCulture("en-US"),
                     out yVal);                
                 points.Add(new Point(x,scaleFactor*yVal));
-                field.Add(new Point(scaleFactor*yVal * Math.Cos(currentAngle), scaleFactor*yVal * Math.Sin(currentAngle)));
+                field.Add(new Point(scaleFactor * yVal * Math.Cos(currRot.yaw + currentAngle), 
+                    scaleFactor * yVal * Math.Sin(currRot.yaw + currentAngle)));
                 x+= 1;
                 currentAngle += inc_angle;
                 if (yVal < min_val)
@@ -550,7 +558,7 @@ namespace TurtleTest
                     if (odometryCount % 100 == 0)
                     {
                         //Console.WriteLine("X: {0}, Y: {1}, Z: {2}, W: {3}", angleX, angleY, angleZ, angleW);
-                        RosBridgeUtility.RotRPY currRot = bridgeLogic.convertQuaternionToEuler(angleX, angleY, angleZ, angleW);
+                        currRot = bridgeLogic.convertQuaternionToEuler(angleX, angleY, angleZ, angleW);
                         //Console.WriteLine("Roll: {0}, Pitch: {1}, Yaw: {2}", currRot.roll, currRot.pitch, currRot.yaw);
                         Dispatcher.Invoke(new Action(() => visualizeOdometry(x, y, currRot.yaw)));
                     }
@@ -603,6 +611,11 @@ namespace TurtleTest
             moveStopped();
         }
 
+        private double radToDeg(double rad)
+        {
+            return rad * 180 / Math.PI;
+        }
+
         private void Window_KeyDown_1(object sender, KeyEventArgs e)
         {
             double vel;
@@ -646,10 +659,14 @@ namespace TurtleTest
                 case Key.K:
                     Double.TryParse(txtTheta.Text, out vel);
                     //txtTheta.Text = (vel + 15).ToString();
+                    bridgeLogic.increaseAngVelocity();
+                    txtTheta.Text = radToDeg(bridgeLogic.current_angVelocity).ToString();
                     break;
                 case Key.L:
                     Double.TryParse(txtTheta.Text, out vel);
-                    txtTheta.Text = (vel - 15).ToString();
+                    //txtTheta.Text = (vel - 15).ToString();
+                    bridgeLogic.decreaseAngVelocity();
+                    txtTheta.Text = radToDeg(bridgeLogic.current_angVelocity).ToString();
                     break;
             }
         }

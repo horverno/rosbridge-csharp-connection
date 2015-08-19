@@ -96,6 +96,12 @@ namespace TurtleTest
                 case "stop":
                     parent.stopTarget(conf.getPublicationList());
                     break;
+                case "inc_ang":
+                    parent.increaseAngVelocity();
+                    break;
+                case "dec_ang":
+                    parent.decreaseAngVelocity();
+                    break;
             }
             
         }
