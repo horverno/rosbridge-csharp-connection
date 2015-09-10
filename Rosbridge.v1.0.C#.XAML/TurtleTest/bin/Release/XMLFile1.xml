@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <rosbridge_config>
-  <network ipaddress="192.168.0.151" port="9090" protocol="ws"/>
+  <network ipaddress="10.2.94.154" port="9090" protocol="ws"/>
   <subscriptions>
-    <topic name="/sick_s300/scan"/>
+    <topic name="/base_scan"/>
     <topic name="/DriveStates"/>
-    <topic name="/odom"/>
+    <topic name="/base_odometry/odom"/>
   </subscriptions>
   <publications>
-    <topic name="/DriveCommands" target="neobotix_mp500"/>
+    <topic name="/base_controller/command" target="pr2"/>
   </publications>
   <projections>
     <query topic="/DriveStates" attribute="angularPosition"/>
@@ -16,13 +16,13 @@
   </projections>
   <visualization>
     <scale r="20.0"/>
-    <laser_field topic="/sick_s300/scan"/>
-    <odometry topic="/odom"/>
+    <laser_field topic="/base_scan"/>
+    <odometry topic="/base_odometry/odom"/>
     <showState topic="/DriveStates"/>
   </visualization>
   <velocity>
     <linear>
-      <threshold max="0.5" min="-0.5"/>
+      <threshold max="2.0" min="-2.0"/>
       <setup increment="0.1" init="0.1"/>
     </linear>
     <angular>
