@@ -1,0 +1,14 @@
+[comment encoding = UTF-8 /]
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+[import org::eclipse::acceleo::module::robot::config::instance::common::generate/]
+
+[template public generateElement(aPackage: Package)]
+[comment @main/]
+[file (aPackage.name+'.xml',false,'UTF-8')]
+<?xml version="1.0" encoding="UTF-8" ?>
+[for 
+(anInstanceSpec: InstanceSpecification | aPackage.packagedElement->filter(InstanceSpecification))][for 
+(aClassifier : Classifier | anInstanceSpec.classifier)][if 
+(aClassifier.name.toString()='rosbridge_config')][anInstanceSpec.generateElement()/][/if][/for][/for]
+[/file]
+[/template]

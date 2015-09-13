@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_139U8C96EeWxF5hjtptLxQ" name="RosBridgeUtility">
+  <packagedElement xmi:type="uml:Class" xmi:id="_E_0E4C97EeWxF5hjtptLxQ" name="RosBridgeLogic">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_LNDqQC97EeWxF5hjtptLxQ" name="ws" type="_LMgQoC97EeWxF5hjtptLxQ" association="_LNBOAC97EeWxF5hjtptLxQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_WnP1oi97EeWxF5hjtptLxQ" name="subject" type="_WmdygC97EeWxF5hjtptLxQ" association="_WnPOkC97EeWxF5hjtptLxQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_ErgMUC98EeWxF5hjtptLxQ" name="connected">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Boolean"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_tU-VUC98EeWxF5hjtptLxQ" name="CollectedData">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+    </ownedAttribute>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_MSRJYC98EeWxF5hjtptLxQ" name="OnMonitoringStopped"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_OPjVcC98EeWxF5hjtptLxQ" name="isConnected">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_Q56C4C98EeWxF5hjtptLxQ" name="connected" direction="return">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Boolean"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_WzynYC98EeWxF5hjtptLxQ" name="SetUpdateListener"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_ZD6P4C98EeWxF5hjtptLxQ" name="Initialize">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_cqWyIC98EeWxF5hjtptLxQ" name="ipaddress">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_fI-JoC98EeWxF5hjtptLxQ" name="parentSubject" type="_WmdygC97EeWxF5hjtptLxQ"/>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_1Vz_QC98EeWxF5hjtptLxQ" name="Connect"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_2SXHEC98EeWxF5hjtptLxQ" name="Disconnect"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_3k8JQC98EeWxF5hjtptLxQ" name="CollectData"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_6CyrwC98EeWxF5hjtptLxQ" name="InitializeCollection"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_7f8mQC98EeWxF5hjtptLxQ" name="StartCollection">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_gs-BQC-jEeWxF5hjtptLxQ" name="topic">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_iflOYC-jEeWxF5hjtptLxQ" name="throttle">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="__zRcoC98EeWxF5hjtptLxQ" name="RemoveCollection">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_lJAHsC-jEeWxF5hjtptLxQ" name="topic">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_A4L2QC99EeWxF5hjtptLxQ" name="StopCollection">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_8QpYsC-jEeWxF5hjtptLxQ" name="tupleList" direction="return">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_CP1lsC99EeWxF5hjtptLxQ" name="sendSubscription">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_A905gC-kEeWxF5hjtptLxQ" name="topic">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_EKzL0C-kEeWxF5hjtptLxQ" name="throttle">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_E5DqsC99EeWxF5hjtptLxQ" name="sendUnsubscribe">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_IFdDgC-kEeWxF5hjtptLxQ" name="topic">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_GCJZsC99EeWxF5hjtptLxQ" name="ReceiveData"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_HP-ewC99EeWxF5hjtptLxQ" name="sendPublish">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_MRoJAC-kEeWxF5hjtptLxQ" name="topic">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_OPN3EC-kEeWxF5hjtptLxQ" name="msg">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_M3PCMC99EeWxF5hjtptLxQ" name="setSubject">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_SpXHIC-kEeWxF5hjtptLxQ" name="_subject" type="_WmdygC97EeWxF5hjtptLxQ"/>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_NtswIC99EeWxF5hjtptLxQ" name="UpdateOnReceive"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_O-ZjAC99EeWxF5hjtptLxQ" name="getUrl">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_WNc48C-kEeWxF5hjtptLxQ" name="url" direction="return">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_Qt2ucC99EeWxF5hjtptLxQ" name="projectionResponse">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_ZUCPYC-kEeWxF5hjtptLxQ" name="topic">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_a8KDwC-kEeWxF5hjtptLxQ" name="field">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_erMhUC-kEeWxF5hjtptLxQ" name="outlist" direction="return">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_VRpCsC99EeWxF5hjtptLxQ" name="getResponseAttribute"/>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_XdyxMC99EeWxF5hjtptLxQ" name="StartCollections">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_vEg5IC-kEeWxF5hjtptLxQ" name="subscriptions">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_Yt0OoC99EeWxF5hjtptLxQ" name="RemoveCollections">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_xaR2oC-kEeWxF5hjtptLxQ" name="subscriptions">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_Z4hHMC99EeWxF5hjtptLxQ" name="PublishMessage">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_2Hho4C-kEeWxF5hjtptLxQ" name="topic">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_8Om74C-kEeWxF5hjtptLxQ" name="keys">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="__oCV0C-kEeWxF5hjtptLxQ" name="vals">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+      </ownedParameter>
+    </ownedOperation>
+    <ownedOperation xmi:type="uml:Operation" xmi:id="_bqT08C99EeWxF5hjtptLxQ" name="PublishTwistMsg">
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_BX0RYC-lEeWxF5hjtptLxQ" name="topic">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_DEUPcC-lEeWxF5hjtptLxQ" name="linear">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+      </ownedParameter>
+      <ownedParameter xmi:type="uml:Parameter" xmi:id="_El_dkC-lEeWxF5hjtptLxQ" name="angular">
+        <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EEList"/>
+      </ownedParameter>
+    </ownedOperation>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_LMgQoC97EeWxF5hjtptLxQ" name="WebSocket"/>
+  <packagedElement xmi:type="uml:Association" xmi:id="_LNBOAC97EeWxF5hjtptLxQ" visibility="public" memberEnd="_LNDqQC97EeWxF5hjtptLxQ _LNLmEC97EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_LNDDMC97EeWxF5hjtptLxQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_LNDDMS97EeWxF5hjtptLxQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+    <ownedEnd xmi:type="uml:Property" xmi:id="_LNLmEC97EeWxF5hjtptLxQ" name="rosbridgelogic" type="_E_0E4C97EeWxF5hjtptLxQ" association="_LNBOAC97EeWxF5hjtptLxQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Interface" xmi:id="_WmdygC97EeWxF5hjtptLxQ" name="IROSBridgeController">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_WnP1oy97EeWxF5hjtptLxQ" name="rosbridgelogic" type="_E_0E4C97EeWxF5hjtptLxQ" association="_WnPOkC97EeWxF5hjtptLxQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_WnPOkC97EeWxF5hjtptLxQ" memberEnd="_WnP1oi97EeWxF5hjtptLxQ _WnP1oy97EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_WnP1oC97EeWxF5hjtptLxQ" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_WnP1oS97EeWxF5hjtptLxQ" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+  </packagedElement>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_iHRt0C98EeWxF5hjtptLxQ" name="List"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_hpGuoC99EeWxF5hjtptLxQ" name="PublishMessage">
+    <generalization xmi:type="uml:Generalization" xmi:id="_txT2kC99EeWxF5hjtptLxQ" general="_xmqXgC99EeWxF5hjtptLxQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_69YZ0C9-EeWxF5hjtptLxQ" name="msg" type="_5TaLUC9-EeWxF5hjtptLxQ"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_lTPeEC99EeWxF5hjtptLxQ" name="Window"/>
+  <packagedElement xmi:type="uml:Realization" xmi:id="_mPTdsC99EeWxF5hjtptLxQ" client="_lTPeEC99EeWxF5hjtptLxQ" supplier="_WmdygC97EeWxF5hjtptLxQ"/>
+  <packagedElement xmi:type="uml:Dependency" xmi:id="_o0UYIC99EeWxF5hjtptLxQ" client="_E_0E4C97EeWxF5hjtptLxQ" supplier="_hpGuoC99EeWxF5hjtptLxQ"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_twjBkC99EeWxF5hjtptLxQ" name="SubscribeMessage">
+    <generalization xmi:type="uml:Generalization" xmi:id="_xnXiIC99EeWxF5hjtptLxQ" general="_xmqXgC99EeWxF5hjtptLxQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_vlPc4C9-EeWxF5hjtptLxQ" name="throttle_rate">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Integer"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_xmqXgC99EeWxF5hjtptLxQ" name="UnsubscribeMessage">
+    <generalization xmi:type="uml:Generalization" xmi:id="_6OphAC99EeWxF5hjtptLxQ" general="_6N89cC99EeWxF5hjtptLxQ"/>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_prvS4C9-EeWxF5hjtptLxQ" name="topic" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_6N89cC99EeWxF5hjtptLxQ" name="MsgOperation">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_bAsawC9-EeWxF5hjtptLxQ" name="op" isUnique="false">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#String"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Dependency" xmi:id="_9kIPEC99EeWxF5hjtptLxQ" client="_E_0E4C97EeWxF5hjtptLxQ" supplier="_twjBkC99EeWxF5hjtptLxQ"/>
+  <packagedElement xmi:type="uml:Dependency" xmi:id="_99dVEC99EeWxF5hjtptLxQ" client="_E_0E4C97EeWxF5hjtptLxQ" supplier="_xmqXgC99EeWxF5hjtptLxQ"/>
+  <packagedElement xmi:type="uml:DataType" xmi:id="_5TaLUC9-EeWxF5hjtptLxQ" name="JObject"/>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2LZOUC96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2LbqkC96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#/"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_TZ_nULU5EduiKqCzJMWbGw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2Let4C96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2Let4S96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//modelelements"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_Gx8MgLX7EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2LhKIC96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2LhKIS96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//blocks"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_fSw28LX7EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2LhxMC96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2LhxMS96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//portandflows"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_rpx28LX7EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2LiYQC96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2LiYQS96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//constraints"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_5WYJ0LX7EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2Li_UC96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2Li_US96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//activities"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_C2zXMLX8EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2LjmYC96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2LjmYS96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//allocations"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_NxdG4LX8EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2LjmYi96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2LkNcC96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//requirements"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_OOJC4LX8EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2LkNcS96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2Lk0gC96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//interactions"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_meOioLX8EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2Lk0gS96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2LlbkC96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//statemachines"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_nAF5kLX8EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_2LlbkS96EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_2LmCoC96EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="http://www.eclipse.org/papyrus/0.7.0/SysML#//usecases"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://SysML_PROFILES/SysML.profile.uml#_neZmMLX8EduFmqQsrNB9lw"/>
+  </profileApplication>
+  <profileApplication xmi:type="uml:ProfileApplication" xmi:id="_lvHFQC9-EeWxF5hjtptLxQ">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_lvHFQS9-EeWxF5hjtptLxQ" source="http://www.eclipse.org/uml2/2.0.0/UML">
+      <references xmi:type="ecore:EPackage" href="pathmap://PAPYRUS_ACTIONLANGUAGE_PROFILE/ActionLanguage-Profile.profile.uml#_Kv8EIKFXEeS_KNX0nfvIVQ"/>
+    </eAnnotations>
+    <appliedProfile xmi:type="uml:Profile" href="pathmap://PAPYRUS_ACTIONLANGUAGE_PROFILE/ActionLanguage-Profile.profile.uml#ActionLanguage"/>
+  </profileApplication>
+</uml:Model>

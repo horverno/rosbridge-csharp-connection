@@ -1,0 +1,10 @@
+[comment encoding = UTF-8 /]
+[module generate('http://www.eclipse.org/uml2/5.0.0/UML')]
+[template public generateElement(anInstanceSpec : InstanceSpecification)]
+<[for (aClassifier: Classifier | anInstanceSpec.classifier)][aClassifier.name/] [/for] [for 
+( aVal: LiteralString | anInstanceSpec.slot.value->filter(LiteralString) )] [aVal.owner.oclAsType(Slot).definingFeature.name/]="[aVal.value/]" [/for][for ( 
+aVal: LiteralReal | anInstanceSpec.slot.value->filter(LiteralReal) )] [aVal.owner.oclAsType(Slot).definingFeature.name/]="[aVal.value/]" [/for]>
+    [for (p : InstanceValue | anInstanceSpec.slot.value->filter(InstanceValue))][p.instance.generateElement()/][/for]
+</[for (aClassifier: Classifier | anInstanceSpec.classifier)][aClassifier.name/][/for]>
+
+[/template]

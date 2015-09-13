@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rosbridge_config >
+    <velocity >
+        <angular >
+            <setup increment="1.0" init="10.0" >
+                
+            </setup>
+            <threshold max="15.0" min="-15.0" >
+                
+            </threshold>
+            
+        </angular>
+        <linear >
+            <setup init="0.1" increment="0.1" >
+                
+            </setup>
+            <threshold max="2.0" min="-2.0" >
+                
+            </threshold>
+            
+        </linear>
+        
+    </velocity>
+    <publications >
+        <topic name="/base_controller/command" target="pr2" >
+            
+        </topic>
+        
+    </publications>
+    <projections >
+        <query attribute="ranges" topic="/scan_front" >
+            
+        </query>
+        <query attribute="angularVelocity" topic="/DriveStates" >
+            
+        </query>
+        <query topic="/DriveStates" attribute="angularPosition" >
+            
+        </query>
+        
+    </projections>
+    <subscriptions >
+        <topic name="/base_scan" >
+            
+        </topic>
+        <topic name="/DriveStates" >
+            
+        </topic>
+        <topic name="/base_odometry/odom" >
+            
+        </topic>
+        
+    </subscriptions>
+    <visualization >
+        <showState topic="/DriveStates" >
+            
+        </showState>
+        <scale r="20.0" >
+            
+        </scale>
+        <odometry topic="/base_odometry/odom" >
+            
+        </odometry>
+        <laser_field topic="/base_scan" >
+            
+        </laser_field>
+        
+    </visualization>
+    <network protocol="ws" port="9090" ipaddress="10.2.94.154" >
+        
+    </network>
+    
+</rosbridge_config>

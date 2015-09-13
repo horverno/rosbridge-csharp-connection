@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uml:Model xmi:version="20131001" xmlns:xmi="http://www.omg.org/spec/XMI/20131001" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML" xmi:id="_zxybIDBVEeWX4a_mt-mU9A" name="UsedMessages">
+  <packageImport xmi:type="uml:PackageImport" xmi:id="_C0UmMDBWEeWX4a_mt-mU9A">
+    <importedPackage xmi:type="uml:Profile" href="pathmap://UML_PROFILES/Standard.profile.uml#_0"/>
+  </packageImport>
+  <packagedElement xmi:type="uml:Class" xmi:id="_2uF0MDBVEeWX4a_mt-mU9A" name="serrelay">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_7_FMsDBVEeWX4a_mt-mU9A" name="angularVelocity">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/UMLPrimitiveTypes.library.uml#Real"/>
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_998GEDBVEeWX4a_mt-mU9A" value="2"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_9-BloDBVEeWX4a_mt-mU9A" value="2"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_HTBmIDBWEeWX4a_mt-mU9A" name="driveActive">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_VVCvYDBWEeWX4a_mt-mU9A" value="2"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_VVD9gDBWEeWX4a_mt-mU9A" value="2"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_SVRLkDBWEeWX4a_mt-mU9A" name="quickStop">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_U1-00DBWEeWX4a_mt-mU9A" value="2"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_U2B4IDBWEeWX4a_mt-mU9A" value="2"/>
+    </ownedAttribute>
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_VtcBQDBWEeWX4a_mt-mU9A" name="disableBrake">
+      <type xmi:type="uml:PrimitiveType" href="pathmap://UML_LIBRARIES/EcorePrimitiveTypes.library.uml#EBoolean"/>
+      <lowerValue xmi:type="uml:LiteralInteger" xmi:id="_X7plQDBWEeWX4a_mt-mU9A" value="2"/>
+      <upperValue xmi:type="uml:LiteralUnlimitedNatural" xmi:id="_X7sokDBWEeWX4a_mt-mU9A" value="2"/>
+    </ownedAttribute>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_mlqZwDtmEeW-BOjnbRU5yA" name="Pose">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_psIbcDtmEeW-BOjnbRU5yA" name="pose" type="_oeHJIDtmEeW-BOjnbRU5yA" association="_psGmQDtmEeW-BOjnbRU5yA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_oeHJIDtmEeW-BOjnbRU5yA" name="Pose">
+    <ownedAttribute xmi:type="uml:Property" xmi:id="_psNT8DtmEeW-BOjnbRU5yA" name="pose" type="_mlqZwDtmEeW-BOjnbRU5yA" association="_psGmQDtmEeW-BOjnbRU5yA"/>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Association" xmi:id="_psGmQDtmEeW-BOjnbRU5yA" memberEnd="_psIbcDtmEeW-BOjnbRU5yA _psNT8DtmEeW-BOjnbRU5yA">
+    <eAnnotations xmi:type="ecore:EAnnotation" xmi:id="_psH0YDtmEeW-BOjnbRU5yA" source="org.eclipse.papyrus">
+      <details xmi:type="ecore:EStringToStringMapEntry" xmi:id="_psH0YTtmEeW-BOjnbRU5yA" key="nature" value="UML_Nature"/>
+    </eAnnotations>
+  </packagedElement>
+  <packagedElement xmi:type="uml:Class" xmi:id="_qasKkDtmEeW-BOjnbRU5yA" name="Position"/>
+  <packagedElement xmi:type="uml:Class" xmi:id="_rCvpEDtmEeW-BOjnbRU5yA" name="Orientation"/>
+</uml:Model>
