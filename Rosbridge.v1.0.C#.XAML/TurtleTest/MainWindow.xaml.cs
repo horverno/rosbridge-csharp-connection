@@ -22,6 +22,7 @@ using System.Windows.Shapes;
 using WebSocketSharp.Server;
 using WebSocketSharp.Net;
 using System.IO;
+using Microsoft.Kinect;
 
 namespace TurtleTest
 {
@@ -49,8 +50,112 @@ namespace TurtleTest
 
         private static double scaleFactor = 10;
 
-        //private WebSocketServer NeobotixStateServer;
+        // Kinect specific attributes
+        private KinectSensor sensor;
+        private WriteableBitmap kinect_rgb;
+        private byte[] kinect_pixels;
+        // Kinect depth
+        private WriteableBitmap kinect_depth;
+        private byte[] depth_color;
+        private DepthImagePixel[] depth_pixels;
         
+        // Kinect specific methods
+        public void enumerateKinect()
+        {
+            foreach (var potentialSensor in KinectSensor.KinectSensors)
+            {
+                if (potentialSensor.Status == KinectStatus.Connected)
+                {
+                    this.sensor = potentialSensor;
+                    break;
+                }
+            }
+            if (this.sensor != null)
+            {
+                this.sensor.ColorStream.Enable(ColorImageFormat.RgbResolution640x480Fps30);
+                this.kinect_pixels = new byte[this.sensor.ColorStream.FramePixelDataLength];
+                this.kinect_rgb = new WriteableBitmap(this.sensor.ColorStream.FrameWidth,
+                    this.sensor.ColorStream.FrameHeight, 96.0, 96.0, PixelFormats.Bgr32, null);
+                // Depth stream
+                this.sensor.DepthStream.Enable(DepthImageFormat.Resolution640x480Fps30);
+                this.depth_pixels = new DepthImagePixel[this.sensor.DepthStream.FramePixelDataLength];
+                this.depth_color = new byte[this.sensor.DepthStream.FramePixelDataLength * sizeof(int)];
+                this.kinect_depth = new WriteableBitmap(this.sensor.DepthStream.FrameWidth,
+                    this.sensor.DepthStream.FrameHeight, 96.0, 96.0, PixelFormats.Bgr32, null);
+                
+                this.kinect_screen.Source = this.kinect_rgb;
+                this.kinect_depth_screen.Source = this.kinect_depth;
+                this.sensor.ColorFrameReady += sensor_ColorFrameReady;
+                this.sensor.DepthFrameReady += sensor_DepthFrameReady;
+                try
+                {
+                    this.sensor.Start();
+                    Console.WriteLine("Kinect setup completed");
+                }
+                catch (IOException)
+                {
+                    this.sensor = null;
+                }
+            }
+        }
+
+        void sensor_DepthFrameReady(object sender, DepthImageFrameReadyEventArgs e)
+        {
+            using (DepthImageFrame depthFrame = e.OpenDepthImageFrame())
+            {
+                if (depthFrame != null)
+                {
+                    depthFrame.CopyDepthImagePixelDataTo(this.depth_pixels);
+                    int minDepth = depthFrame.MinDepth;
+                    int maxDepth = depthFrame.MaxDepth;
+
+                    int colorPixelIndex = 0;
+
+                    for (int i = 0; i < this.depth_pixels.Length; ++i)
+                    {
+                        short depth = depth_pixels[i].Depth;
+                        byte intensity = (byte)(depth >= minDepth && depth <= maxDepth ? depth : 0);
+                        this.depth_color[colorPixelIndex++] = intensity;
+                        this.depth_color[colorPixelIndex++] = intensity;
+                        this.depth_color[colorPixelIndex++] = intensity;
+                        ++colorPixelIndex;
+                    }
+                    this.kinect_depth.WritePixels(
+                        new Int32Rect(0, 0, this.kinect_depth.PixelWidth, this.kinect_depth.PixelHeight),
+                        this.depth_color, this.kinect_depth.PixelWidth * sizeof(int), 0);
+                    BitmapSource source = this.kinect_depth_screen.Source as BitmapSource;
+                    wcon.updateDepthState(ref source, source.PixelHeight, source.PixelWidth);
+                }
+            }
+        }
+
+        
+        void updateKinectImage()
+        {
+            BitmapSource source = kinect_screen.Source as BitmapSource;
+            wcon.updateRGBState(ref source, source.PixelHeight, source.PixelWidth);
+        }
+
+        int kinectread=0;
+
+        void sensor_ColorFrameReady(object sender, ColorImageFrameReadyEventArgs e)
+        {
+            using (ColorImageFrame colorFrame = e.OpenColorImageFrame())
+            {
+                if (colorFrame != null)
+                {
+                    colorFrame.CopyPixelDataTo(this.kinect_pixels);
+                    this.kinect_rgb.WritePixels(
+                        new Int32Rect(0, 0, this.kinect_rgb.PixelWidth, this.kinect_rgb.PixelHeight),
+                        this.kinect_pixels,
+                        this.kinect_rgb.PixelWidth * sizeof(int), 0);
+
+                    BitmapSource source = this.kinect_screen.Source as BitmapSource;
+                    wcon.updateRGBState(ref source, source.PixelHeight, source.PixelWidth);
+                    kinectread++;
+                }
+            }
+        }
 
         // Web controller
         private WebController wcon;
@@ -106,7 +211,18 @@ namespace TurtleTest
                 Console.WriteLine("Error during read: {0}",e.Data);
             }
             wcon.updateVelocityState(bridgeLogic.currentVelocityState);
+            var u1 = new Uri(System.IO.Path.Combine(Environment.CurrentDirectory,"test1.jpg"));
+            BitmapImage img1 = new BitmapImage(u1);
+
+            kinect_screen.Source = img1;
+
+            BitmapSource source = kinect_screen.Source as BitmapSource;
             //NeobotixStateServer = new WebSocketServer("ws://localhost:9091");
+            wcon.updateRGBState(ref source, img1.PixelHeight, img1.PixelWidth);
+            source = kinect_depth_screen.Source as BitmapSource;
+            //NeobotixStateServer = new WebSocketServer("ws://localhost:9091");
+            //wcon.updateDepthState(ref source, img1.PixelHeight, img1.PixelWidth);
+            // Kinect refresher timer
             
         }
         
@@ -114,8 +230,7 @@ namespace TurtleTest
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
             try
-            {
-                wcon.startWebServer();
+            {               
                 
                 if (connectionState == (int)(ConnectionState.Disconnected))
                 {
@@ -125,6 +240,7 @@ namespace TurtleTest
                         btnConnect.Background = Brushes.LightGreen;
                         btnConnect.Content = "Disconnect";
                         stackControls.Visibility = System.Windows.Visibility.Visible;
+                        wcon.startWebServer();
                     }
                 }
                 else
@@ -134,6 +250,7 @@ namespace TurtleTest
                     btnConnect.Background = Brushes.OrangeRed;
                     btnConnect.Content = "Connect";
                     stackControls.Visibility = System.Windows.Visibility.Hidden;
+                    wcon.stopWebServer();
                 }                
             }
             catch (System.Net.Sockets.SocketException se)
@@ -395,6 +512,7 @@ namespace TurtleTest
             orientationCursor = new Line();
             predictedPosition.Width = 20;
             predictedPosition.Height = 20;
+            
             predictedPosition.Stroke = System.Windows.Media.Brushes.DarkMagenta;
             predictedPosition.StrokeThickness = 2;
             laser_field.Children.Add(predictedPosition);
@@ -404,8 +522,8 @@ namespace TurtleTest
             orientationCursor.X2 = scaleFactor * 4 * Math.Cos(lastMeasuredAngle);
             orientationCursor.Y2 = scaleFactor * 4 * Math.Sin(lastMeasuredAngle);
             laser_field.Children.Add(orientationCursor);
-            new_posX += 10*Math.Cos(lastMeasuredAngle) * diffDistance;
-            new_posY += 10*Math.Sin(lastMeasuredAngle) * diffDistance;
+            new_posX += 10 * Math.Cos(lastMeasuredAngle) * diffDistance;
+            new_posY += 10 * Math.Sin(lastMeasuredAngle) * diffDistance;
             new_posX_dot = new_posX - last_posX;
             new_posY_dot = new_posY - last_posY;
             Console.WriteLine("Distance function: {0}",
@@ -438,6 +556,7 @@ namespace TurtleTest
             Console.WriteLine("(dist,angle): {0} {1}", lastMeasuredDistance, lastMeasuredAngle);
             */
             laser_field.Children.Add(odometryLine);
+            //Console.WriteLine("{0},{1}", last_posX, last_posY);
             Canvas.SetLeft(predictedPosition, last_posX-5);
             Canvas.SetTop(predictedPosition, last_posY-5);
             Canvas.SetLeft(orientationCursor, last_posX);
@@ -447,6 +566,7 @@ namespace TurtleTest
 
         private void visualizeOdometry(Double x, Double y, Double newAngle)
         {
+            
             laser_field.Children.Remove(predictedPosition);
             laser_field.Children.Remove(orientationCursor);
             laser_field.Children.Remove(odometryLine);
@@ -463,12 +583,16 @@ namespace TurtleTest
             orientationCursor.Stroke = System.Windows.Media.Brushes.Indigo;
             orientationCursor.StrokeThickness = 10;
             orientationCursor.X1 = 0; orientationCursor.Y1 = 0;
-            orientationCursor.X2 = scaleFactor * 4 * Math.Cos(newAngle);
-            orientationCursor.Y2 = scaleFactor * 4 * Math.Sin(newAngle);
+            orientationCursor.X2 = scaleFactor * 10 * Math.Cos(newAngle);
+            orientationCursor.Y2 = scaleFactor * 10 * Math.Sin(newAngle);
             laser_field.Children.Add(predictedPosition);
             laser_field.Children.Add(orientationCursor);
-            double posX = scaleFactor * x;
-            double posY = scaleFactor * y;
+            double neobot_scale = 10;
+            double offsetX = 100;
+            double offsetY = 100;
+            double posX = scaleFactor * neobot_scale * x + offsetX;
+            double posY = scaleFactor * neobot_scale * y + offsetY;
+            
             odometryData.Add(new Point(posX, posY));
             odometryLine = new Polyline();
             odometryLine.Stroke = System.Windows.Media.Brushes.MediumVioletRed;
@@ -505,15 +629,28 @@ namespace TurtleTest
                 */
                 Double angle_inc;
                 Double min_angle;
-                Double.TryParse(jsonData["msg"]["angle_increment"].ToString(),
-                    NumberStyles.Number,
-                    CultureInfo.CreateSpecificCulture("en-US"), 
-                    out angle_inc);
-                Double.TryParse(jsonData["msg"]["angle_min"].ToString(),
-                    NumberStyles.Number,
-                    CultureInfo.CreateSpecificCulture("en-US"),
-                    out min_angle);
-
+                if (jsonData["msg"]["angle_increment"].ToString().Contains(","))
+                {
+                    Double.TryParse(jsonData["msg"]["angle_increment"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("hu-HU"),
+                        out angle_inc);
+                    Double.TryParse(jsonData["msg"]["angle_min"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("hu-HU"),
+                        out min_angle);
+                }
+                else
+                {
+                    Double.TryParse(jsonData["msg"]["angle_increment"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out angle_inc);
+                    Double.TryParse(jsonData["msg"]["angle_min"].ToString(),
+                        NumberStyles.Number,
+                        CultureInfo.CreateSpecificCulture("en-US"),
+                        out min_angle);
+                }
                 Dispatcher.Invoke(new Action(() =>
                     laserScanCanvas(jsonData["msg"]["ranges"].ToList(), angle_inc, min_angle)));
 
@@ -531,30 +668,60 @@ namespace TurtleTest
                         out measuredDistance));
                     */
                     Double x, y, angleX, angleY, angleZ, angleW = 0;
-                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["x"].ToString(),
-                        NumberStyles.Number,
-                        CultureInfo.CreateSpecificCulture("en-US"),
-                        out x);
-                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["y"].ToString(),
-                        NumberStyles.Number,
-                        CultureInfo.CreateSpecificCulture("en-US"),
-                        out y);
-                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["x"].ToString(),
-                        NumberStyles.Number,
-                        CultureInfo.CreateSpecificCulture("en-US"),
-                        out angleX);
-                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["y"].ToString(),
-                        NumberStyles.Number,
-                        CultureInfo.CreateSpecificCulture("en-US"),
-                        out angleY);
-                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["z"].ToString(),
-                        NumberStyles.Number,
-                        CultureInfo.CreateSpecificCulture("en-US"),
-                        out angleZ);
-                    Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["w"].ToString(),
-                        NumberStyles.Number,
-                        CultureInfo.CreateSpecificCulture("en-US"),
-                        out angleW);
+                    if (jsonData["msg"]["pose"]["pose"]["position"]["x"].ToString().Contains(","))
+                    {
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["x"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("de-DE"),
+                            out x);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["y"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("de-DE"),
+                            out y);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["x"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("de-DE"),
+                            out angleX);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["y"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("de-DE"),
+                            out angleY);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["z"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("de-DE"),
+                            out angleZ);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["w"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("de-DE"),
+                            out angleW);
+                    }
+                    else
+                    {
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["x"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("en-US"),
+                            out x);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["position"]["y"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("en-US"),
+                            out y);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["x"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("en-US"),
+                            out angleX);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["y"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("en-US"),
+                            out angleY);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["z"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("en-US"),
+                            out angleZ);
+                        Double.TryParse(jsonData["msg"]["pose"]["pose"]["orientation"]["w"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("en-US"),
+                            out angleW);
+                    }
                     if (odometryCount % 100 == 0)
                     {
                         //Console.WriteLine("X: {0}, Y: {1}, Z: {2}, W: {3}", angleX, angleY, angleZ, angleW);
@@ -565,15 +732,29 @@ namespace TurtleTest
                 }
                 else
                 {
-                    Double.TryParse(jsonData["msg"]["distance"].ToString(),
-                        NumberStyles.Number,
-                        CultureInfo.CreateSpecificCulture("en-US"),
-                        out measuredDistance);
-                    Double.TryParse(jsonData["msg"]["angle"].ToString(),
-                        NumberStyles.Number,
-                        CultureInfo.CreateSpecificCulture("en-US"),
-                        out measuredAngle);
-                    Dispatcher.Invoke(new Action(() => visualizeOdometry(measuredDistance, measuredAngle)));
+                    if (jsonData["msg"]["distance"].ToString().Contains(","))
+                    {
+                        Double.TryParse(jsonData["msg"]["distance"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("de-DE"),
+                            out measuredDistance);
+                        Double.TryParse(jsonData["msg"]["angle"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("de-DE"),
+                            out measuredAngle);
+                        Dispatcher.Invoke(new Action(() => visualizeOdometry(measuredDistance, measuredAngle)));
+                    }
+                    {
+                        Double.TryParse(jsonData["msg"]["distance"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("en-US"),
+                            out measuredDistance);
+                        Double.TryParse(jsonData["msg"]["angle"].ToString(),
+                            NumberStyles.Number,
+                            CultureInfo.CreateSpecificCulture("en-US"),
+                            out measuredAngle);
+                        Dispatcher.Invoke(new Action(() => visualizeOdometry(measuredDistance, measuredAngle)));
+                    }
                 }
                 
             }
@@ -670,6 +851,21 @@ namespace TurtleTest
                     break;
             }
         }
+
+        private void Window_Loaded_1(object sender, RoutedEventArgs e)
+        {
+            enumerateKinect();
+        }
+
+        private void Window_Closing_1(object sender, CancelEventArgs e)
+        {
+            if (this.sensor != null)
+            {
+                this.sensor.Stop();
+            }
+        }
+
+
         
 
     }

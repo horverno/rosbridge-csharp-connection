@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media.Imaging;
 using WebSocketSharp.Net;
 using WebSocketSharp.Server;
 
@@ -18,6 +19,8 @@ namespace TurtleTest
 
         private HttpServer NeobotixStateServer;
         private RosBridgeUtility.ServerStorage LastMsgs;
+        private RosBridgeUtility.ImageStorage LastRGB;
+        private RosBridgeUtility.ImageStorage LastDepth;
 
         RosBridgeUtility.RosBridgeLogic parent;
 
@@ -27,10 +30,12 @@ namespace TurtleTest
             this.parent = parent;
             // Initialize webserver
             NeobotixStateServer = new HttpServer(4649);
-            NeobotixStateServer.RootPath = "..\\..\\Public\\";
+            NeobotixStateServer.RootPath = "../../Public";
             Console.WriteLine(NeobotixStateServer.RootPath);
 
             LastMsgs = new RosBridgeUtility.ServerStorage();
+            LastRGB = new RosBridgeUtility.ImageStorage();
+            LastDepth = new RosBridgeUtility.ImageStorage();
             NeobotixStateServer.OnGet += (sender, e) =>
             {
                 var req = e.Request;
@@ -39,7 +44,6 @@ namespace TurtleTest
                 var path = req.RawUrl;                
                 if (path == "/")
                 {
-                    //path = "..\\..\\Public\\index.html";
                     path += "index.html";
                 }
                 path = NeobotixStateServer.RootPath + path;
@@ -67,7 +71,12 @@ namespace TurtleTest
                 () => new RosBridgeUtility.StateBehavior(LastMsgs));
             NeobotixStateServer.AddWebSocketService<RosBridgeUtility.TeleopKeyBehavior>(("/neobot_teleop"),
                 () => new RosBridgeUtility.TeleopKeyBehavior(LastMsgs, this));
-            
+            NeobotixStateServer.AddWebSocketService<RosBridgeUtility.LaserScanBehavior>(("/neobot_laser"),
+                () => new RosBridgeUtility.LaserScanBehavior(LastMsgs));
+            NeobotixStateServer.AddWebSocketService<RosBridgeUtility.ImageBehavior>(("/kinect_image"),
+                () => new RosBridgeUtility.ImageBehavior(LastRGB));
+            NeobotixStateServer.AddWebSocketService<RosBridgeUtility.ImageBehavior>(("/kinect_depth"),
+                () => new RosBridgeUtility.ImageBehavior(LastDepth));
         }
 
         public void teleopTarget(String request)
@@ -124,7 +133,32 @@ namespace TurtleTest
         public void updateVelocityState(RosBridgeUtility.VelocityState msg)
         {
             LastMsgs.lastStateMsg = msg;
-        }        
+        }
+
+        public void updateImageState(ref BitmapSource source, Int32 height, Int32 width, RosBridgeUtility.ImageStorage target)
+        {
+            target.lastImageMsg = new RosBridgeUtility.ImageState();
+            target.lastImageMsg.height = height;
+            target.lastImageMsg.width = width;
+            var encoder = new JpegBitmapEncoder();
+            var frame = BitmapFrame.Create(source);
+            encoder.Frames.Add(frame);
+            using (var stream = new MemoryStream())
+            {
+                encoder.Save(stream);
+                target.lastImageMsg.pixels = Convert.ToBase64String(stream.ToArray());
+            }
+        }
+
+        public void updateRGBState(ref BitmapSource source, Int32 height, Int32 width)
+        {
+            updateImageState(ref source, height, width, LastRGB);
+        }
+
+        public void updateDepthState(ref BitmapSource source, Int32 height, Int32 width)
+        {
+            updateImageState(ref source, height, width, LastDepth);
+        }
 
         public void updateMessages(JObject jsonData)
         {
@@ -181,7 +215,13 @@ namespace TurtleTest
                 Double.TryParse(jsonData["msg"]["angle_min"].ToString(),
                     NumberStyles.Number,
                     CultureInfo.CreateSpecificCulture("en-US"),
-                    out min_angle);                
+                    out min_angle);
+                JArray ranges = JArray.Parse(jsonData["msg"]["ranges"].ToString());
+                RosBridgeUtility.LaserScanMsg laserMsg = new RosBridgeUtility.LaserScanMsg();
+                laserMsg.ranges = ranges;
+                laserMsg.angle_increment = angle_inc;
+                laserMsg.min_angle = min_angle;
+                LastMsgs.lastLaserScanMsg = laserMsg;
             }
         }
     }

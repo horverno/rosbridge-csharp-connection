@@ -2,12 +2,16 @@
 
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <link  rel="stylesheet" type="text/css" href="Content/bootstrap/bootstrap.css"/>
+
+    <link  rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" media ="screen"/>      
     <script type="text/javascript" src="JS/odomView.js">
 
     </script>
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
     <meta charset="utf-8" />
-    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+    <title>JKK Teleoperation tool</title>
 </head>
 <body>
     <nav class="navbar navbar-inverse">
@@ -23,8 +27,23 @@
                     <canvas id="odometry_canvas" />
                 </div>
             </div>
-            <div class="col-sm-6">
-
+            <div class="table-responsive">
+                <table>
+                    <tr>
+                        <td>
+                            <div class="col-sm-6" id="kinect_screen">
+                                <img id="kinect_image"/>
+                            </div>            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="col-sm-6" id="Div1">
+                                <img id="kinect_depth"/>
+                            </div>            
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
@@ -35,40 +54,43 @@
         </div>
         <div class="btn-group">
             <button type="button" class="btn btn-default" id="button_inc_vel">
-                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                <span class="glyphicon glyphicon-plus" aria-hidden="true">Increase</span>
             </button>            
             <button type="button" class="btn btn-default" id="button_move_forward">
-                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true"></span>
+                <span class="glyphicon glyphicon-triangle-top" aria-hidden="true">Forward</span>
             </button>
             <button type="button" class="btn btn-default" id="button_dec_vel">
-                <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                <span class="glyphicon glyphicon-minus" aria-hidden="true">Decrease</span>
             </button>
         </div>
         <br />
         <div class="btn-group">
             
             <button type="button" class="btn btn-default" id="button_move_left">
-                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true">Left</span>
             </button>
             <button type="button" class="btn btn-default" id="button_move_backward">
-                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true"></span>
+                <span class="glyphicon glyphicon-triangle-bottom" aria-hidden="true">Backwards</span>
             </button>
             <button type="button" class="btn btn-default" id="button_move_right">
-                <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                <span class="glyphicon glyphicon-triangle-right" aria-hidden="true">Right</span>
             </button>
         </div>
         <br />
         <div class="btn-group">
-            <div class="btn-info" id="btn_inc_ang">
+            <button class="btn btn-info" id="btn_inc_ang">
                 Increase Angular Velocity
-            </div>
-            <div class="btn-info" id="btn_dec_ang">
+            </button>
+            <button class="btn btn-info" id="btn_dec_ang">
                 Decrease Angular Velocity
-            </div>
-            <div class="btn-danger" id="button_stop">
+            </button>
+            <button class="btn btn-danger" id="button_stop">
                 Stop
-            </div>
+            </button>
         </div>
     </div>
+
+    <script src="Scripts/jquery-1.9.1.min.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
 </body>
 </html>

@@ -4,16 +4,16 @@
 exe
 C#
 .cs
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Release\
+c:\DATA_ARCH\JKK_ROS\newRos\Rosbridge.v1.0.C#.XAML\TurtleTest\obj\Release\
 TurtleTest
 none
 false
 TRACE
-E:\ROS\rosbridge-csharp-connection-master\Rosbridge.v1.0.C#.XAML\TurtleTest\App.xaml
+c:\DATA_ARCH\JKK_ROS\newRos\Rosbridge.v1.0.C#.XAML\TurtleTest\App.xaml
 11151548125
 13-427323258
 6156881440
-16-1988423927
+17-270343123
 MainWindow.xaml;
 
 False

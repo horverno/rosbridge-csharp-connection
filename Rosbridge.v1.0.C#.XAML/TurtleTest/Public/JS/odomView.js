@@ -1,8 +1,18 @@
 ﻿var url_odom = "ws://10.2.250.239:4649/neobot_odom";
 var url_teleop = "ws://10.2.250.239:4649/neobot_teleop";
 var url_state = "ws://10.2.250.239:4649/server_state";
+var url_laser = "ws://10.2.250.239:4649/neobot_laser";
+var url_img = "ws://10.2.250.239:4649/kinect_image";
+var url_depth = "ws://10.2.250.239:4649/kinect_depth";
 
 var output_odom;
+
+var robot_posX = 0;
+var robot_posY = 0;
+var robot_yaw = 0;
+var scale = 5.0;
+var offset_x = 100;
+var offset_y = 50;
 
 function init() {
     output_odom = document.getElementById("odometry_data");
@@ -41,9 +51,30 @@ function init() {
     websocket_state.onmessage = function (evt) {
         state_OnMsg(evt);
     }
+    // Laser websocket
+    websocket_laser = new WebSocket(url_laser);
+    websocket_laser.onmessage = function (evt) {
+        onMsg_laser(evt);
+    }
+    // Image websocket
+    websocket_img = new WebSocket(url_img);
+    websocket_img.onmessage = function (evt) {
+        onMsg_img(evt);
+    }
+    // Depth websocket
+    websocket_depth = new WebSocket(url_depth);
+    websocket_depth.onmessage = function (evt) {
+        onMsg_depth(evt);
+    }
 }
 
+function doWebSocketDepth() {
+    websocket_depth.send("depth");
+}
 
+function doWebSocket_laser() {
+    websocket_laser.send("laser");
+}
 
 function doWebSocket_State() {
     websocket_state.send("state");
@@ -53,6 +84,26 @@ function sendTeleop(cmd) {
     var teleop_msg = { command: cmd }
     
     websocket_teleop.send(JSON.stringify(teleop_msg, null, 2));
+}
+
+// Receiving depth
+function onMsg_depth(evt) {
+    depthScreen = document.getElementById("kinect_depth");
+    var depth_obj = JSON.parse(evt.data);
+    depthScreen.src = "data:image/jpeg;base64," + depth_obj.pixels;
+}
+// Receiving image
+function onMsg_img(evt) {
+    imgScreen = document.getElementById("kinect_image");
+    var img_obj = JSON.parse(evt.data);
+    
+    imgScreen.src = "data:image/jpeg;base64," + img_obj.pixels;
+    //console.log(img_obj.pixels);
+}
+
+// Send image request
+function doWebSocket_img() {
+    websocket_img.send("image");
 }
 
 function state_OnMsg(evt) {
@@ -113,6 +164,7 @@ function drawIndex(posX, posY, w, x, y, z, c_ctx, stroke_style) {
     roll = Math.atan2(2 * (w * x + y * z), 1 - 2 * (Math.pow(x, 2) + Math.pow(y, 2)));
     pitch = Math.asin(2 * (w * y - z * x));
     yaw = Math.atan2(2 * (w * z + x * y), 1 - 2 * (Math.pow(y, 2) + Math.pow(z, 2)));
+    robot_yaw = yaw;
     arrowLength = 40;
     dirX = Math.cos(yaw) * arrowLength;
     dirY = Math.sin(yaw) * arrowLength;
@@ -127,12 +179,10 @@ function drawIndex(posX, posY, w, x, y, z, c_ctx, stroke_style) {
 function drawOdometry(x, y, ori_w, ori_x, ori_y, ori_z) {
     var c = document.getElementById("odometry_canvas");    
     var ctx = c.getContext("2d");
-    ctx.clearRect(0, 0, c.width, c.height);
+    
     ctx.beginPath();
-    scale = 10.0;
     radius = 10;
-    offset_x = 100;
-    offset_y = 50;
+    
     currX = x * scale + offset_x;
     currY = y * scale + offset_y;
     ctx.arc(currX, currY, radius, 0, 2 * Math.PI);
@@ -146,6 +196,34 @@ function drawOdometry(x, y, ori_w, ori_x, ori_y, ori_z) {
     drawIndex(currX, currY, ori_w, ori_x, ori_y, ori_z, ctx, odom_gradient);
 }
 
+function onMsg_laser(evt) {
+    laserRead = JSON.parse(evt.data);
+    drawLaser(laserRead.min_angle, laserRead.angle_increment, laserRead.ranges);
+}
+
+function drawLaser(min_angle, angle_inc, ranges) {    
+    var c = document.getElementById("odometry_canvas");
+    var ctx = c.getContext("2d");
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.beginPath();
+    var laser_gradient = ctx.createLinearGradient(0, 0, c.width, 0);
+    laser_gradient.addColorStop("0", "SlateBlue");
+    laser_gradient.addColorStop("0.5", "MediumVioletRed");
+    laser_gradient.addColorStop("1.0", "MidnightBlue");
+
+    var curr_angle = min_angle;
+    for (var i = 0; i < ranges.length; i++) {
+        posX = robot_posX + Math.cos(robot_yaw + curr_angle) * ranges[i] * scale;
+        posY = robot_posY + Math.sin(robot_yaw + curr_angle) * ranges[i] * scale;
+        ctx.lineTo(posX, posY);
+        curr_angle += angle_inc;        
+    }
+    ctx.strokeStyle = laser_gradient;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+
 function onMessage(evt) {
     // Parse odometry
     var odom_obj = JSON.parse(evt.data);
@@ -153,15 +231,10 @@ function onMessage(evt) {
     p1 = output_odom.getElementsByTagName("p");
     for (var i = 0; i < p1.length; i++) {
         output_odom.removeChild(p1[i]);
-    }
-    console.log(evt.data);
-    writeOdometry("x: " + odom_obj.x);
-    writeOdometry("y: " + odom_obj.y);
-    writeOdometry("z: " + odom_obj.z);
-    writeOdometry("ori_w: " + odom_obj.ori_w);
-    writeOdometry("ori_x: " + odom_obj.ori_x);
-    writeOdometry("ori_y: " + odom_obj.ori_y);
-    writeOdometry("ori_z: " + odom_obj.ori_z);
+    }   
+
+    robot_posX = odom_obj.x * scale + offset_x;
+    robot_posY = odom_obj.y * scale + offset_y;
     
     drawOdometry(odom_obj.x, odom_obj.y,
         odom_obj.ori_w, odom_obj.ori_x, odom_obj.ori_y, odom_obj.ori_z);
@@ -209,8 +282,11 @@ function increaseVelocityAng() {
 }
 
 window.setInterval(function () {
-    doWebSocket_State();
+    doWebSocket_State();    
     doWebSocket_odom();
+    doWebSocket_laser();
+    doWebSocket_img();
+    doWebSocketDepth();
 }, 1000);
 
 
